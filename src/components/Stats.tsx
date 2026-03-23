@@ -163,7 +163,7 @@ export default function Stats({ locale }: { locale: Locale }) {
       className="relative w-full py-24 px-4 md:px-8 bg-cover bg-center"
       style={{ backgroundImage: 'url("/assets/service/7.webp")' }}
     >
-      <div className="absolute inset-0 bg-white/88" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/82 via-white/88 to-white/95" />
       <div className="relative max-w-[1200px] mx-auto">
         {/* Header */}
         <div className="text-center mb-20">

@@ -11,44 +11,96 @@ export default async function ServicesPage({
   const lang = isValidLoc ? (locale as Locale) : "en";
   const t = translations[lang];
 
-  const services = [
-    {
-      icon: "⚖️",
-      title: "LEGAL SERVICES",
-      description:
-        "Comprehensive legal support for individuals and businesses, including consultations, drafting, review, and strategic legal guidance across key practice areas.",
-    },
-    {
-      icon: "🏢",
-      title: "CORPORATE SERVICES",
-      description:
-        "Business setup, restructuring, governance advisory, and compliance assistance tailored for startups, SMEs, and established organizations in the UAE.",
-    },
-    {
-      icon: "📝",
-      title: "NOTARY PUBLIC SERVICES",
-      description:
-        "Support with notarization workflows, document attestation preparation, and guidance to ensure submissions meet required legal standards.",
-    },
-    {
-      icon: "📱",
-      title: "ACCOUNTING SERVICES",
-      description:
-        "Gulf Star Accounting provides accounting services through qualified professional accountants with extensive experience in the various activities of companies, and the success of any institution depends on the effectiveness of its accounting and financial system, and the competent professional accountant is the cornerstone of this system.",
-    },
-    {
-      icon: "🌍",
-      title: "SECOND PASSPORT",
-      description:
-        "Advisory support for second passport and citizenship pathways, including eligibility review, document readiness, and process coordination.",
-    },
-    {
-      icon: "📑",
-      title: "EXPERT REPORTS",
-      description:
-        "Preparation of clear, structured expert reports and technical legal documentation to support disputes, claims, and court-related proceedings.",
-    },
-  ];
+  const services =
+    lang === "ar"
+      ? [
+          {
+            icon: "⚖️",
+            slug: "legal-services",
+            title: "الخدمات القانونية",
+            description:
+              "دعم قانوني شامل للأفراد والشركات، يشمل الاستشارات والصياغة والمراجعة والتوجيه القانوني الاستراتيجي عبر أبرز المجالات.",
+          },
+          {
+            icon: "🏢",
+            slug: "corporate-services",
+            title: "الخدمات المؤسسية",
+            description:
+              "تأسيس الأعمال وإعادة الهيكلة والحوكمة والامتثال، بحلول مصممة للشركات الناشئة والمتوسطة والكبيرة في الإمارات.",
+          },
+          {
+            icon: "📝",
+            slug: "notary-public-services",
+            title: "خدمات الكاتب العدل",
+            description:
+              "دعم إجراءات التوثيق وتجهيز المستندات القانونية وضمان توافق المعاملات مع المتطلبات الرسمية المعتمدة.",
+          },
+          {
+            icon: "📱",
+            slug: "accounting-services",
+            title: "الخدمات المحاسبية",
+            description:
+              "تقدم شركة الخليج ستار للمحاسبة خدمات محاسبية من خلال محاسبين محترفين مؤهلين بخبرة واسعة لضمان كفاءة النظام المالي والمحاسبي.",
+          },
+          {
+            icon: "🌍",
+            slug: "second-passport",
+            title: "الجواز الثاني",
+            description:
+              "استشارات متخصصة لبرامج الجنسية والجواز الثاني، تشمل تقييم الأهلية وتجهيز الملفات ومتابعة الإجراءات.",
+          },
+          {
+            icon: "📑",
+            slug: "expert-reports",
+            title: "تقارير الخبرة",
+            description:
+              "إعداد تقارير خبرة واضحة ومنظمة ووثائق فنية قانونية لدعم النزاعات والمطالبات والإجراءات القضائية.",
+          },
+        ]
+      : [
+          {
+            icon: "⚖️",
+            slug: "legal-services",
+            title: "LEGAL SERVICES",
+            description:
+              "Comprehensive legal support for individuals and businesses, including consultations, drafting, review, and strategic legal guidance across key practice areas.",
+          },
+          {
+            icon: "🏢",
+            slug: "corporate-services",
+            title: "CORPORATE SERVICES",
+            description:
+              "Business setup, restructuring, governance advisory, and compliance assistance tailored for startups, SMEs, and established organizations in the UAE.",
+          },
+          {
+            icon: "📝",
+            slug: "notary-public-services",
+            title: "NOTARY PUBLIC SERVICES",
+            description:
+              "Support with notarization workflows, document attestation preparation, and guidance to ensure submissions meet required legal standards.",
+          },
+          {
+            icon: "📱",
+            slug: "accounting-services",
+            title: "ACCOUNTING SERVICES",
+            description:
+              "Gulf Star Accounting provides accounting services through qualified professional accountants with extensive experience in the various activities of companies, and the success of any institution depends on the effectiveness of its accounting and financial system, and the competent professional accountant is the cornerstone of this system.",
+          },
+          {
+            icon: "🌍",
+            slug: "second-passport",
+            title: "SECOND PASSPORT",
+            description:
+              "Advisory support for second passport and citizenship pathways, including eligibility review, document readiness, and process coordination.",
+          },
+          {
+            icon: "📑",
+            slug: "expert-reports",
+            title: "EXPERT REPORTS",
+            description:
+              "Preparation of clear, structured expert reports and technical legal documentation to support disputes, claims, and court-related proceedings.",
+          },
+        ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-20 px-4 md:px-8">
@@ -73,15 +125,10 @@ export default async function ServicesPage({
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => {
-            // Map service titles to their respective page slugs
-            const slug = service.title
-              .toLowerCase()
-              .replace(/\s+/g, '-')
-              .replace(/[^a-z0-9\-]/g, '');
             return (
               <Link
                 key={index}
-                href={`/${lang}/${slug}`}
+                href={`/${lang}/${service.slug}`}
                 className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl hover:shadow-amber-400/30 transition-shadow border border-gray-700 group relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-amber-400"
                 tabIndex={0}
               >

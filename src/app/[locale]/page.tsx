@@ -171,7 +171,7 @@ export default function Home() {
             </div>
 
             <Link
-              href="#about"
+              href={`/${lang}/services`}
               className={`inline-flex items-center gap-2 font-bold py-2.5 md:py-3 px-4 sm:px-6 md:px-8 rounded-2xl shadow-lg bg-[#222] text-white text-base md:text-lg tracking-wide group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#bfa08a]/40 border border-[#bfa08a] hover:bg-[#bfa08a] hover:text-[#222] hover:scale-105 hover:shadow-2xl w-fit justify-center mx-auto ${isRTL ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}
               style={{ minWidth: 0, letterSpacing: '0.04em', boxShadow: '0 4px 24px 0 rgba(191, 160, 138, 0.12)' }}
             >
