@@ -13,7 +13,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Locale } from '@/lib/translations';
-import { ensureDashboardAccessRequest, getDashboardAccess, getPrimaryAdminEmail, normalizeEmail } from '@/lib/admin-access';
+import { ensureDashboardAccessRequest, getPrimaryAdminEmail, normalizeEmail } from '@/lib/admin-access';
 
 export default function LoginPage() {
   const params = useParams();
@@ -73,14 +73,17 @@ export default function LoginPage() {
         return;
       }
 
-      const access = await getDashboardAccess(user.email);
+      const access = await ensureDashboardAccessRequest(user.email);
       if (access?.status === 'active') {
         router.push(`/${locale}/dashboard`);
+        return;
       }
+
+      setFeedback({ type: 'success', message: t.inviteOnly });
     });
 
     return () => unsubscribe();
-  }, [locale, router]);
+  }, [locale, router, t.inviteOnly]);
 
   const validateInputs = () => {
     const normalizedEmail = normalizeEmail(email);

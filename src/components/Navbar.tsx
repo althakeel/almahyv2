@@ -40,6 +40,8 @@ export default function Navbar({ locale }: NavbarProps) {
   const isValidLoc = locale === 'en' || locale === 'ar';
   const lang = isValidLoc ? (locale as Locale) : 'en';
   const t = translations[lang];
+  const currentUserLabelSource = currentUser?.displayName?.trim() || currentUser?.email?.trim() || '';
+  const currentUserLabel = currentUserLabelSource.length > 25 ? `${currentUserLabelSource.slice(0, 25)}...` : currentUserLabelSource;
   const authText = lang === 'ar'
     ? {
         title: 'تسجيل الدخول / إنشاء حساب',
@@ -145,6 +147,12 @@ export default function Navbar({ locale }: NavbarProps) {
 
   const runGoogleSignIn = async () => {
     try {
+      if (currentUser?.email) {
+        setAuthModalOpen(false);
+        router.push(`/${lang}/dashboard`);
+        return;
+      }
+
       setAuthFeedback(null);
       setAuthLoading(true);
       const provider = new GoogleAuthProvider();
@@ -167,10 +175,23 @@ export default function Navbar({ locale }: NavbarProps) {
         setAuthModalOpen(false);
         router.push(access?.status === 'active' ? `/${lang}/dashboard` : `/${lang}/login`);
       }, 600);
-    } catch {
+    } catch (error: any) {
+      const code = error?.code as string | undefined;
+      let message = lang === 'ar' ? 'فشل تسجيل الدخول عبر Google.' : 'Google sign-in failed.';
+
+      if (code === 'auth/popup-closed-by-user') {
+        message = lang === 'ar' ? 'تم إغلاق نافذة تسجيل الدخول قبل الإكمال.' : 'Sign-in popup was closed before completion.';
+      } else if (code === 'auth/popup-blocked') {
+        message = lang === 'ar' ? 'تم حظر النافذة المنبثقة. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.' : 'Popup was blocked. Allow popups and try again.';
+      } else if (code === 'auth/unauthorized-domain') {
+        message = lang === 'ar' ? 'الدومين غير مصرح به في Firebase Authentication.' : 'This domain is not authorized in Firebase Authentication.';
+      } else if (code === 'auth/operation-not-allowed') {
+        message = lang === 'ar' ? 'تسجيل الدخول عبر Google غير مفعّل في Firebase.' : 'Google provider is not enabled in Firebase Auth.';
+      }
+
       setAuthFeedback({
         type: 'error',
-        message: lang === 'ar' ? 'فشل تسجيل الدخول عبر Google.' : 'Google sign-in failed.',
+        message,
       });
     } finally {
       setAuthLoading(false);
@@ -180,9 +201,13 @@ export default function Navbar({ locale }: NavbarProps) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
+
+      if (user && authModalOpen) {
+        setAuthModalOpen(false);
+      }
     });
     return () => unsubscribe();
-  }, []);
+  }, [authModalOpen]);
 
   const handleLogout = async () => {
     try {
@@ -329,10 +354,19 @@ export default function Navbar({ locale }: NavbarProps) {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)'
               }}
             >
-              <span>👤</span>
+              {currentUser?.photoURL ? (
+                <img
+                  src={currentUser.photoURL}
+                  alt={currentUser.displayName || currentUser.email || 'User profile'}
+                  className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span>👤</span>
+              )}
               {currentUser ? (
                 <>
-                  <span className="hidden xs:inline md:inline">{lang === 'en' ? 'DASHBOARD' : 'لوحة التحكم'}</span>
+                  <span className="hidden xs:inline md:inline">{lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`}</span>
                   <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Portal' : 'بوابة'}</span>
                 </>
               ) : (
@@ -480,12 +514,22 @@ export default function Navbar({ locale }: NavbarProps) {
                   setMobileMenuOpen(false);
                   currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true);
                 }}
-                className="block w-full rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all duration-200 mt-2 text-center shadow-[0_8px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.4)]"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-bold text-white transition-all duration-200 shadow-[0_8px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.4)]"
                 style={{
                   backgroundColor: '#000000'
                 }}
               >
-                {currentUser ? (lang === 'en' ? 'DASHBOARD' : 'لوحة التحكم') : (lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب')}
+                {currentUser?.photoURL ? (
+                  <img
+                    src={currentUser.photoURL}
+                    alt={currentUser.displayName || currentUser.email || 'User profile'}
+                    className="h-5 w-5 rounded-full object-cover ring-1 ring-white/20"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : currentUser ? (
+                  <span>👤</span>
+                ) : null}
+                {currentUser ? (lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`) : (lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب')}
               </button>
             </div>
           </div>

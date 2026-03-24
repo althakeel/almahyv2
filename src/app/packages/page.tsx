@@ -86,7 +86,7 @@ const packagesData = {
       ]
     }
   ],
-  'Debit Collection': [
+  'Debt Collection': [
     {
       name: 'Golden Plan',
       price: '5K',
