@@ -8,6 +8,17 @@ import { auth } from '@/lib/firebase';
 import { User, signOut } from 'firebase/auth';
 import Logo from '@/assets/logo/logo.png';
 import {
+  approveDashboardAccess,
+  DashboardAccessRecord,
+  ensurePrimaryAdminAccess,
+  ensureDashboardAccessRequest,
+  getDashboardAccess,
+  getPrimaryAdminEmail,
+  listDashboardUsers,
+  normalizeEmail,
+  revokeDashboardAccess,
+} from '@/lib/admin-access';
+import {
   BlogPost,
   BlogsBannerCard,
   readBlogsFromStorage,
@@ -25,8 +36,13 @@ export default function Dashboard() {
   const locale = params?.locale as string || 'en';
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'blogs'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'blogs' | 'access'>('dashboard');
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [accessRole, setAccessRole] = useState<'admin' | 'editor' | null>(null);
+  const [accessUsers, setAccessUsers] = useState<DashboardAccessRecord[]>([]);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [accessFeedback, setAccessFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   const [blogTitle, setBlogTitle] = useState('');
   const [blogTitleAr, setBlogTitleAr] = useState('');
@@ -51,15 +67,59 @@ export default function Dashboard() {
   const [isUploadingBannerImageAr, setIsUploadingBannerImageAr] = useState(false);
   const [isUploadingPageBanner, setIsUploadingPageBanner] = useState(false);
   const [blogFeedback, setBlogFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const primaryAdminEmail = getPrimaryAdminEmail();
+  const isAdmin = accessRole === 'admin';
+
+  const loadAccessUsers = async () => {
+    try {
+      const nextUsers = await listDashboardUsers();
+      setAccessUsers(nextUsers);
+    } catch (error) {
+      console.error('Load access users error:', error);
+      setAccessFeedback({
+        type: 'error',
+        message: locale === 'ar' ? 'تعذر تحميل قائمة الصلاحيات.' : 'Unable to load access list.',
+      });
+    }
+  };
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      if (!currentUser) {
-        router.push(`/${locale}`);
-      } else {
-        setUser(currentUser);
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      if (!currentUser?.email) {
+        setUser(null);
+        setAccessRole(null);
+        setAccessDenied(false);
+        router.push(`/${locale}/login`);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      try {
+        const email = normalizeEmail(currentUser.email);
+        await ensurePrimaryAdminAccess(email);
+        const access = await ensureDashboardAccessRequest(email) || await getDashboardAccess(email);
+
+        if (!access) {
+          setUser(currentUser);
+          setAccessRole(null);
+          setAccessDenied(true);
+          setLoading(false);
+          return;
+        }
+
+        setUser(currentUser);
+        setAccessRole(access.role);
+        setAccessDenied(false);
+
+        if (access.role === 'admin') {
+          await loadAccessUsers();
+        }
+      } catch (error) {
+        console.error('Dashboard access error:', error);
+        setAccessDenied(true);
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
@@ -74,6 +134,62 @@ export default function Dashboard() {
     setBannerCardSubEn(card.subEn);
     setBannerCardSubAr(card.subAr);
   }, []);
+
+  const handleApproveAccess = async (emailToApprove?: string) => {
+    if (!user?.email) {
+      return;
+    }
+
+    const normalizedInviteEmail = normalizeEmail(emailToApprove || inviteEmail);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedInviteEmail);
+
+    if (!isEmail) {
+      setAccessFeedback({
+        type: 'error',
+        message: locale === 'ar' ? 'يرجى إدخال بريد إلكتروني صالح.' : 'Please enter a valid email address.',
+      });
+      return;
+    }
+
+    try {
+      await approveDashboardAccess(normalizedInviteEmail, user.email);
+      setInviteEmail('');
+      setAccessFeedback({
+        type: 'success',
+        message:
+          locale === 'ar'
+            ? 'تمت الموافقة على هذا البريد الإلكتروني للوصول إلى لوحة المدونة.'
+            : 'This email has been approved for blog dashboard access.',
+      });
+      await loadAccessUsers();
+    } catch (error) {
+      console.error('Approve access error:', error);
+      setAccessFeedback({
+        type: 'error',
+        message: locale === 'ar' ? 'تعذر منح الموافقة.' : 'Unable to approve access.',
+      });
+    }
+  };
+
+  const handleRevokeAccess = async (email: string) => {
+    try {
+      await revokeDashboardAccess(email);
+      setAccessFeedback({
+        type: 'success',
+        message: locale === 'ar' ? 'تم سحب الوصول.' : 'Access revoked successfully.',
+      });
+      await loadAccessUsers();
+    } catch (error) {
+      console.error('Revoke access error:', error);
+      setAccessFeedback({
+        type: 'error',
+        message:
+          locale === 'ar'
+            ? 'تعذر سحب الوصول. لا يمكن إزالة البريد الإداري الرئيسي.'
+            : 'Unable to revoke access. The primary admin email cannot be removed.',
+      });
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -339,6 +455,40 @@ export default function Dashboard() {
     );
   }
 
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-[#F1EFF0] px-5 py-24">
+        <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
+          <h1 className="mb-3 text-3xl font-bold text-[#160A0A]">
+            {locale === 'ar' ? 'الوصول مرفوض' : 'Access Denied'}
+          </h1>
+          <p className="mb-4 text-slate-600">
+            {locale === 'ar'
+              ? 'هذا البريد الإلكتروني غير مخول للوصول إلى لوحة المدونة. اطلب من البريد الإداري الرئيسي إضافتك أولاً.'
+              : 'This email address is not allowed to access the blog dashboard. Ask the primary admin to invite you first.'}
+          </p>
+          <p className="mb-6 rounded-xl border border-[#CECDCB] bg-[#F8F7F7] px-4 py-3 text-sm text-slate-600">
+            {locale === 'ar'
+              ? `البريد الإداري الرئيسي: ${primaryAdminEmail || 'غير محدد'}`
+              : `Primary admin email: ${primaryAdminEmail || 'Not configured'}`}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/${locale}/login`} className="rounded-xl bg-[#DE3B34] px-5 py-3 font-semibold text-white hover:bg-[#9B0F09] transition-colors">
+              {locale === 'ar' ? 'العودة لتسجيل الدخول' : 'Back to Login'}
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-xl border border-[#CECDCB] px-5 py-3 font-semibold text-[#160A0A] hover:bg-[#F1EFF0] transition-colors"
+            >
+              {locale === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F1EFF0]" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:w-72 md:flex md:flex-col bg-[#160A0A] text-white p-6 pt-24">
@@ -365,9 +515,17 @@ export default function Dashboard() {
           >
             {locale === 'ar' ? 'إدارة المدونة' : 'Blogs'}
           </button>
-          <div className="rounded-xl px-4 py-3 text-white/80 pointer-events-none">
-            {locale === 'ar' ? 'الحساب' : 'Account'}
-          </div>
+          {isAdmin ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('access')}
+              className={`w-full rounded-xl px-4 py-3 font-semibold text-left transition-colors ${
+                activeSection === 'access' ? 'bg-[#DE3B34] text-white' : 'text-white/80 hover:bg-white/10'
+              }`}
+            >
+              {locale === 'ar' ? 'صلاحيات الوصول' : 'Access Control'}
+            </button>
+          ) : null}
           <div className="rounded-xl px-4 py-3 text-white/80 pointer-events-none">
             {locale === 'ar' ? 'المعاملات' : 'Transactions'}
           </div>
@@ -394,7 +552,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className="md:hidden mb-4 grid grid-cols-2 gap-2">
+        <div className={`md:hidden mb-4 grid gap-2 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             type="button"
             onClick={() => setActiveSection('dashboard')}
@@ -413,6 +571,17 @@ export default function Dashboard() {
           >
             {locale === 'ar' ? 'المدونة' : 'Blogs'}
           </button>
+          {isAdmin ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('access')}
+              className={`rounded-xl px-4 py-2.5 font-semibold transition-colors ${
+                activeSection === 'access' ? 'bg-[#DE3B34] text-white' : 'bg-white text-[#160A0A]'
+              }`}
+            >
+              {locale === 'ar' ? 'الصلاحيات' : 'Access'}
+            </button>
+          ) : null}
         </div>
 
         {activeSection === 'dashboard' ? (
@@ -449,6 +618,111 @@ export default function Dashboard() {
                 </p>
               </section>
             </div>
+          </div>
+        ) : activeSection === 'access' ? (
+          <div className="space-y-5">
+            <section className="rounded-2xl bg-white p-6 md:p-8 shadow-sm">
+              <h1 className="mb-2 text-2xl md:text-3xl font-bold text-[#160A0A]">
+                {locale === 'ar' ? 'إدارة صلاحيات لوحة المدونة' : 'Blog Dashboard Access'}
+              </h1>
+              <p className="mb-6 text-sm text-slate-600">
+                {locale === 'ar'
+                  ? 'يمكن للبريد الإداري الرئيسي فقط الموافقة على المستخدمين ومنحهم صلاحية الوصول إلى لوحة المدونة.'
+                  : 'Only the primary admin can approve users and grant them access to the blog dashboard.'}
+              </p>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(event) => setInviteEmail(event.target.value)}
+                  placeholder={locale === 'ar' ? 'أدخل البريد الإلكتروني للموافقة عليه' : 'Enter an email to approve'}
+                  className="w-full rounded-xl border border-[#CECDCB] bg-white px-4 py-3 text-slate-900 outline-none focus:border-[#DE3B34]"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleApproveAccess()}
+                  className="rounded-xl bg-[#DE3B34] px-6 py-3 font-semibold text-white hover:bg-[#9B0F09] transition-colors"
+                >
+                  {locale === 'ar' ? 'منح الموافقة' : 'Approve Access'}
+                </button>
+              </div>
+
+              {accessFeedback ? (
+                <p className={`mt-4 text-sm ${accessFeedback.type === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {accessFeedback.message}
+                </p>
+              ) : null}
+
+              <div className="mt-6 rounded-xl border border-[#CECDCB] bg-[#F8F7F7] px-4 py-3 text-sm text-slate-600">
+                {locale === 'ar'
+                  ? `البريد الإداري الرئيسي الحالي: ${primaryAdminEmail || 'غير محدد'}`
+                  : `Current primary admin email: ${primaryAdminEmail || 'Not configured'}`}
+              </div>
+            </section>
+
+            <section className="rounded-2xl bg-white p-6 md:p-8 shadow-sm">
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <h2 className="text-xl font-bold text-[#160A0A]">
+                  {locale === 'ar' ? 'المستخدمون المصرح لهم' : 'Authorized Users'}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => void loadAccessUsers()}
+                  className="text-sm font-semibold text-[#DE3B34] hover:text-[#9B0F09]"
+                >
+                  {locale === 'ar' ? 'تحديث القائمة' : 'Refresh List'}
+                </button>
+              </div>
+
+              {accessUsers.length === 0 ? (
+                <p className="text-sm text-slate-600">
+                  {locale === 'ar' ? 'لا يوجد مستخدمون مصرح لهم بعد.' : 'No authorized users yet.'}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {accessUsers.map((accessUser) => (
+                    <article key={accessUser.email} className="flex flex-col gap-3 rounded-xl border border-[#CECDCB] p-4 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <p className="font-semibold text-[#160A0A]">{accessUser.email}</p>
+                        <p className="mt-1 text-sm text-slate-600">
+                          {locale === 'ar'
+                            ? `${accessUser.role === 'admin' ? 'مدير' : 'محرر'} - ${accessUser.status === 'active' ? 'نشط' : 'بانتظار الموافقة'}`
+                            : `${accessUser.role === 'admin' ? 'Admin' : 'Editor'} - ${accessUser.status === 'active' ? 'Active' : 'Pending Approval'}`}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {accessUser.role !== 'admin' ? (
+                          <>
+                            {accessUser.status !== 'active' ? (
+                              <button
+                                type="button"
+                                onClick={() => void handleApproveAccess(accessUser.email)}
+                                className="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
+                              >
+                                {locale === 'ar' ? 'موافقة' : 'Approve'}
+                              </button>
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => void handleRevokeAccess(accessUser.email)}
+                              className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors"
+                            >
+                              {locale === 'ar' ? 'سحب الوصول' : 'Revoke Access'}
+                            </button>
+                          </>
+                        ) : (
+                          <span className="rounded-lg bg-[#F1EFF0] px-3 py-2 text-xs font-semibold text-slate-600">
+                            {locale === 'ar' ? 'الإدارة الرئيسية' : 'Primary Admin'}
+                          </span>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         ) : (
           <div className="space-y-5">

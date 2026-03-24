@@ -16,6 +16,7 @@ import Logo from '../assets/logo/logo.png';
 import { translations, Locale } from '@/lib/translations';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
+import { ensureDashboardAccessRequest, normalizeEmail } from '@/lib/admin-access';
 
 interface NavbarProps {
   locale: string;
@@ -75,7 +76,8 @@ export default function Navbar({ locale }: NavbarProps) {
       return;
     }
 
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authContact.trim());
+    const normalizedEmail = normalizeEmail(authContact);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
     if (!isEmail) {
       setAuthFeedback({
         type: 'error',
@@ -89,31 +91,40 @@ export default function Navbar({ locale }: NavbarProps) {
 
     try {
       setAuthLoading(true);
+      let signedInEmail = normalizedEmail;
+
       if (mode === 'login') {
-        await signInWithEmailAndPassword(auth, authContact.trim(), authPassword);
+        const credential = await signInWithEmailAndPassword(auth, normalizedEmail, authPassword);
+        signedInEmail = normalizeEmail(credential.user.email || normalizedEmail);
       } else {
-        await createUserWithEmailAndPassword(auth, authContact.trim(), authPassword);
+        const credential = await createUserWithEmailAndPassword(auth, normalizedEmail, authPassword);
+        signedInEmail = normalizeEmail(credential.user.email || normalizedEmail);
       }
+
+      const access = await ensureDashboardAccessRequest(signedInEmail);
 
       setAuthFeedback({
         type: 'success',
         message:
-          mode === 'login'
-            ? lang === 'ar'
-              ? 'تم تسجيل الدخول بنجاح.'
-              : 'Logged in successfully.'
+          access?.status === 'active'
+            ? mode === 'login'
+              ? lang === 'ar'
+                ? 'تم تسجيل الدخول بنجاح.'
+                : 'Logged in successfully.'
+              : lang === 'ar'
+                ? 'تم إنشاء الحساب بنجاح.'
+                : 'Account created successfully.'
             : lang === 'ar'
-              ? 'تم إنشاء الحساب بنجاح.'
-              : 'Account created successfully.',
+              ? 'تم استلام طلب الوصول. سيتمكن المدير من الموافقة عليك قبل دخول لوحة المدونة.'
+              : 'Access request received. The admin must approve you before you can open the dashboard.',
       });
 
-      if (mode === 'login') {
-        setTimeout(() => {
-          setAuthModalOpen(false);
-          setAuthContact('');
-          setAuthPassword('');
-        }, 700);
-      }
+      setTimeout(() => {
+        setAuthModalOpen(false);
+        setAuthContact('');
+        setAuthPassword('');
+        router.push(access?.status === 'active' ? `/${lang}/dashboard` : `/${lang}/login`);
+      }, 700);
     } catch (error: any) {
       const code = error?.code as string | undefined;
       let message = lang === 'ar' ? 'حدث خطأ غير متوقع.' : 'Unexpected error occurred.';
@@ -137,13 +148,24 @@ export default function Navbar({ locale }: NavbarProps) {
       setAuthFeedback(null);
       setAuthLoading(true);
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const signedInEmail = result.user.email ? normalizeEmail(result.user.email) : '';
+      const access = signedInEmail ? await ensureDashboardAccessRequest(signedInEmail) : null;
+
       setAuthFeedback({
         type: 'success',
-        message: lang === 'ar' ? 'تم تسجيل الدخول عبر Google بنجاح.' : 'Signed in with Google successfully.',
+        message:
+          access?.status === 'active'
+            ? lang === 'ar'
+              ? 'تم تسجيل الدخول عبر Google بنجاح.'
+              : 'Signed in with Google successfully.'
+            : lang === 'ar'
+              ? 'تم استلام طلب الوصول. بانتظار موافقة المدير.'
+              : 'Access request received. Waiting for admin approval.',
       });
       setTimeout(() => {
         setAuthModalOpen(false);
+        router.push(access?.status === 'active' ? `/${lang}/dashboard` : `/${lang}/login`);
       }, 600);
     } catch {
       setAuthFeedback({
