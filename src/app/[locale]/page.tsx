@@ -84,10 +84,12 @@ export default function Home() {
   /* ---------------- Hero Background Slider ---------------- */
 
   const heroImages = [
-   "/assets/bannerSlider/image.png",
-      "/assets/bannerSlider/main3.webp",
-    "/assets/bannerSlider/6.webp",
-    "/assets/bannerSlider/image.png",
+   "/assets/bannerSlider/main5.webp",
+
+    // "/assets/bannerSlider/image.png",
+    //   "/assets/bannerSlider/main3.webp",
+    // "/assets/bannerSlider/6.webp",
+    // "/assets/bannerSlider/image.png",
   ];
   const [bgIdx, setBgIdx] = useState(0);
   useEffect(() => {
@@ -105,64 +107,43 @@ export default function Home() {
       {/* HERO SECTION */}
 
       <section
-        className="relative w-full h-[80vh] min-h-[750px] md:min-h-[600px] max-h-[1200px] bg-cover bg-center bg-no-repeat flex items-center"
+        className="relative w-full h-[65vh] min-h-[750px] md:min-h-[600px] max-h-[1200px] bg-cover bg-center bg-no-repeat flex items-center"
         style={{
           backgroundImage: `url("${heroImages[bgIdx]}")`,
         }}
       >
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/0"></div>
+
+        {/* Right Bottom Badge - Section Level */}
+        <div className="hidden md:flex absolute bottom-20 right-20 flex-col items-center select-none gap-1 z-20">
+          <span className="text-8xl font-bold text-black leading-none" style={{ fontFamily: '"Mizra", "Times New Roman", serif' }}>{count}</span>
+          <span className="text-lg text-black leading-none font-medium" style={{ fontFamily: '"Mizra", "Times New Roman", serif' }}>{isRTL ? "سنة" : "Years"}</span>
+          <span className="text-base text-black/70 font-medium text-center" style={{ fontFamily: '"Mizra", "Times New Roman", serif' }}>
+            {isRTL ? "الخدمات القانونية" : "Legal Services"}
+          </span>
+        </div>
 
         <div className="relative z-10 w-full">
-          <div className="max-w-7xl mx-auto flex items-center px-6 md:px-20 w-full">
-
-          {/* Left Badge */}
-
-          <div className="hidden md:flex flex-col items-center mr-16 select-none">
-
-            <div className="relative w-28 h-28 flex flex-col items-center justify-center">
-              <span className="absolute inset-0 rounded-full border-2 border-dashed border-[#bfa08a] animate-spin"></span>
-
-              <span className="text-2xl md:text-4xl font-serif text-[#bfa08a] leading-none z-10">{count}</span>
-              <span className="text-sm md:text-base text-white/80 leading-none z-10">{isRTL ? "سنة" : "Years"}</span>
-            </div>
-
-            <div className="flex flex-col items-center mt-4">
-              <span className="w-[2px] h-8 bg-white"></span>
-            </div>
-
-            <span
-              className="text-white/80 text-xs md:text-base tracking-widest mt-2 md:mt-2 ml-2 md:ml-0"
-              style={{
-                writingMode: "vertical-rl",
-                textOrientation: "mixed",
-                letterSpacing: "0.1em",
-                fontFamily: "inherit",
-                fontWeight: 400,
-              }}
-            >
-              {isRTL ? "الخدمات القانونية" : "Legal Services"}
-            </span>
-
-          </div>
+          <div className="max-w-[1250px] mx-auto flex items-center px-4 md:px-8 w-full">
 
           {/* Text */}
 
-          <div className="flex-1 flex flex-col justify-center items-start text-left w-full md:ml-6 ml-0" style={{gap: '5px', height: '260px'}}>
+          <div className="flex-1 flex flex-col justify-center items-start text-left w-full" style={{gap: '5px', height: '260px'}}>
 
-            <span className={`uppercase text-[#bfa08a] text-xs font-semibold mb-2 tracking-widest${isRTL ? ' mb-4' : ''}`}>
+            <span className={`uppercase text-[#CECDCB] text-xs font-semibold mb-2 tracking-widest${isRTL ? ' mb-4' : ''}`} style={{fontFamily: "Montserrat, sans-serif"}}>
               {isRTL ? "دَع المحكمة لنا" : "Leave Court To Us"}
             </span>
 
             <h1
-              className={`text-3xl md:text-5xl font-serif font-bold text-white mt-4 whitespace-pre-line max-w-4xl flex items-center transition-opacity duration-700 ${fade ? 'opacity-100' : 'opacity-0'}`}
-              style={{ width: "100%", height: "220px" }}
+              className={`text-3xl md:text-5xl font-bold text-black mt-4 whitespace-pre-line max-w-4xl flex items-center transition-opacity duration-700 ${fade ? 'opacity-100' : 'opacity-0'}`}
+              style={{ width: "100%", height: "220px", fontFamily: "Montserrat, sans-serif", textAlign: "left" }}
             >
               {currentHeadline}
             </h1>
 
-            <div className="flex flex-row items-center mb-2 md:mb-3 w-full">
-              <div className="w-1 h-8 md:h-12 bg-[#bfa08a] mr-2 md:mr-4" />
-              <p className="text-white/90 text-base xs:text-lg md:text-xl font-normal max-w-full md:max-w-4xl w-full" style={{textShadow: '0 1px 8px rgba(0,0,0,0.18)'}}>
+            <div className="flex flex-row items-center mb-2 md:mb-3 w-full md:w-1/2">
+              <div className="w-1 h-8 md:h-12 bg-[#CECDCB] mr-2 md:mr-4" />
+              <p className="text-black/90 text-base xs:text-lg md:text-xl font-normal w-full text-left" style={{textShadow: '0 1px 8px rgba(0,0,0,0.18)', fontFamily: "Montserrat, sans-serif"}}>
                 {isRTL
                   ? "نحن منارة خبرتك القانونية، حيث تتحول القضايا الصعبة إلى انتصارات. واجه التحديات القانونية بثقة بينما نتولى نحن التعقيدات."
                   : "We stand as your beacon of legal mastery, where daunting issues are transformed into victories. Navigate legal challenges with confidence while we handle the complexities."
@@ -172,8 +153,8 @@ export default function Home() {
 
             <Link
               href={`/${lang}/services`}
-              className={`inline-flex items-center gap-2 font-bold py-2.5 md:py-3 px-4 sm:px-6 md:px-8 rounded-2xl shadow-lg bg-[#222] text-white text-base md:text-lg tracking-wide group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#bfa08a]/40 border border-[#bfa08a] hover:bg-[#bfa08a] hover:text-[#222] hover:scale-105 hover:shadow-2xl w-fit justify-center mx-auto ${isRTL ? 'md:ml-auto md:mr-0' : 'md:mr-auto md:ml-0'}`}
-              style={{ minWidth: 0, letterSpacing: '0.04em', boxShadow: '0 4px 24px 0 rgba(191, 160, 138, 0.12)' }}
+              className={`inline-flex items-center gap-2 font-bold py-2.5 md:py-3 px-4 sm:px-6 md:px-8 rounded-2xl shadow-lg bg-[#DE3B34] text-white text-base md:text-lg tracking-wide group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#CECDCB]/40 border border-[#CECDCB] hover:bg-[#CECDCB] hover:text-[#160A0A] hover:scale-105 hover:shadow-2xl w-fit justify-center`}
+              style={{ minWidth: 0, letterSpacing: '0.04em', boxShadow: '0 4px 24px 0 rgba(222, 59, 52, 0.15)', fontFamily: "Montserrat, sans-serif" }}
             >
               <span className="text-xl font-extrabold transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">+</span>
               <span className="transition-colors duration-300">{isRTL ? "اعرف المزيد" : "Learn More"}</span>
@@ -211,4 +192,4 @@ export default function Home() {
 
     </div>
   );
-}
+} 

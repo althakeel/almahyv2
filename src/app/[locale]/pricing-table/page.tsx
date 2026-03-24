@@ -322,7 +322,7 @@ export default async function Page({
       {featured && (
         <div
           className="absolute -top-4 left-1/2 transform -translate-x-1/2 text-white px-6 py-1 rounded-full text-xs font-bold uppercase"
-          style={{ backgroundColor: accent, color: "#181818" }}
+          style={{ backgroundColor: accent, color: "#160A0A" }}
         >
           Popular
         </div>
@@ -369,7 +369,7 @@ export default async function Page({
           featured
             ? {
                 backgroundColor: accent,
-                color: "#181818",
+                color: "#160A0A",
                 boxShadow: "0 2px 8px 0 #D4B15A33",
               }
             : {
@@ -486,7 +486,7 @@ export default async function Page({
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block text-gray-900 font-bold px-10 py-4 rounded-full transition-colors shadow-xl border-2"
-            style={{ backgroundColor: accentSoft, borderColor: accent, color: "#1f2937" }}
+            style={{ backgroundColor: accentSoft, borderColor: accent, color: "#160A0A" }}
           >
             {lang === 'en' ? 'Contact Sales Team' : 'اتصل بفريق المبيعات'}
           </Link>

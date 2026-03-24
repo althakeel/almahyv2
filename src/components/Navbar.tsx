@@ -3,9 +3,19 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut,
+  User,
+} from 'firebase/auth';
 import Logo from '../assets/logo/logo.png';
 import { translations, Locale } from '@/lib/translations';
 import { usePathname, useRouter } from 'next/navigation';
+import { auth } from '@/lib/firebase';
 
 interface NavbarProps {
   locale: string;
@@ -13,6 +23,12 @@ interface NavbarProps {
 
 export default function Navbar({ locale }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authContact, setAuthContact] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authFeedback, setAuthFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -23,10 +39,136 @@ export default function Navbar({ locale }: NavbarProps) {
   const isValidLoc = locale === 'en' || locale === 'ar';
   const lang = isValidLoc ? (locale as Locale) : 'en';
   const t = translations[lang];
+  const authText = lang === 'ar'
+    ? {
+        title: 'تسجيل الدخول / إنشاء حساب',
+        subtitle: 'ادخل إلى حسابك أو أنشئ حساباً جديداً للمتابعة.',
+        contact: 'رقم الهاتف أو البريد الإلكتروني',
+        password: 'كلمة المرور',
+        login: 'تسجيل الدخول',
+        register: 'إنشاء حساب',
+        google: 'تسجيل الدخول عبر Google',
+      }
+    : {
+        title: 'Login / Register',
+        subtitle: 'Sign in to your account or create a new one to continue.',
+        contact: 'Phone Number or Email Address',
+        password: 'Password',
+        login: 'Login',
+        register: 'Create Account',
+        google: 'Sign in with Google',
+      };
 
   const switchLanguage = (newLocale: Locale) => {
     const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
     router.push(newPathname);
+  };
+
+  const runAuthAction = async (mode: 'login' | 'register') => {
+    setAuthFeedback(null);
+
+    if (!authContact.trim() || !authPassword.trim()) {
+      setAuthFeedback({
+        type: 'error',
+        message: lang === 'ar' ? 'يرجى إدخال رقم الهاتف/البريد وكلمة المرور.' : 'Please enter phone/email and password.',
+      });
+      return;
+    }
+
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authContact.trim());
+    if (!isEmail) {
+      setAuthFeedback({
+        type: 'error',
+        message:
+          lang === 'ar'
+            ? 'تسجيل الدخول عبر الهاتف غير متاح حالياً. يرجى استخدام البريد الإلكتروني.'
+            : 'Phone login is not enabled yet. Please use an email address.',
+      });
+      return;
+    }
+
+    try {
+      setAuthLoading(true);
+      if (mode === 'login') {
+        await signInWithEmailAndPassword(auth, authContact.trim(), authPassword);
+      } else {
+        await createUserWithEmailAndPassword(auth, authContact.trim(), authPassword);
+      }
+
+      setAuthFeedback({
+        type: 'success',
+        message:
+          mode === 'login'
+            ? lang === 'ar'
+              ? 'تم تسجيل الدخول بنجاح.'
+              : 'Logged in successfully.'
+            : lang === 'ar'
+              ? 'تم إنشاء الحساب بنجاح.'
+              : 'Account created successfully.',
+      });
+
+      if (mode === 'login') {
+        setTimeout(() => {
+          setAuthModalOpen(false);
+          setAuthContact('');
+          setAuthPassword('');
+        }, 700);
+      }
+    } catch (error: any) {
+      const code = error?.code as string | undefined;
+      let message = lang === 'ar' ? 'حدث خطأ غير متوقع.' : 'Unexpected error occurred.';
+
+      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+        message = lang === 'ar' ? 'بيانات الدخول غير صحيحة.' : 'Invalid login credentials.';
+      } else if (code === 'auth/email-already-in-use') {
+        message = lang === 'ar' ? 'البريد الإلكتروني مستخدم بالفعل.' : 'Email is already in use.';
+      } else if (code === 'auth/weak-password') {
+        message = lang === 'ar' ? 'كلمة المرور ضعيفة. استخدم 6 أحرف على الأقل.' : 'Weak password. Use at least 6 characters.';
+      }
+
+      setAuthFeedback({ type: 'error', message });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const runGoogleSignIn = async () => {
+    try {
+      setAuthFeedback(null);
+      setAuthLoading(true);
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      setAuthFeedback({
+        type: 'success',
+        message: lang === 'ar' ? 'تم تسجيل الدخول عبر Google بنجاح.' : 'Signed in with Google successfully.',
+      });
+      setTimeout(() => {
+        setAuthModalOpen(false);
+      }, 600);
+    } catch {
+      setAuthFeedback({
+        type: 'error',
+        message: lang === 'ar' ? 'فشل تسجيل الدخول عبر Google.' : 'Google sign-in failed.',
+      });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setCurrentUser(null);
+    } catch (error: any) {
+      console.error('Logout error:', error);
+    }
   };
 
   useEffect(() => {
@@ -54,6 +196,7 @@ export default function Navbar({ locale }: NavbarProps) {
   }, [lastScrollY]);
 
   return (
+    <>
     <nav className={`fixed top-0 z-50 flex justify-center w-full transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div
         className={`
@@ -61,7 +204,7 @@ export default function Navbar({ locale }: NavbarProps) {
           border border-white/20
           shadow-xl text-white
           rounded-b-[18px]
-          bg-gradient-to-r from-[#181c24] via-[#23273a] to-[#181c24]
+          bg-gradient-to-r from-[#160A0A] via-[#160A0A] to-[#160A0A]
           backdrop-blur-2xl bg-opacity-60
         `}
         style={{ WebkitBackdropFilter: 'blur(16px) saturate(140%)', backdropFilter: 'blur(16px) saturate(140%)' }}
@@ -77,19 +220,22 @@ export default function Navbar({ locale }: NavbarProps) {
 
           {/* Center: Navigation Links */}
           <div className={`hidden md:flex items-center gap-6 lg:gap-10 order-2 ${lang === 'ar' ? 'justify-end' : 'justify-start'}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-            <Link href={`/${lang}`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#F8E48B'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+            <Link href={`/${lang}`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#DE3B34'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
               {t.home}
             </Link>
-            <Link href={`/${lang}/services`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#F8E48B'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+            <Link href={`/${lang}/services`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#DE3B34'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
               {t.ourServices}
             </Link>
-            <Link href={`/${lang}/pricing-table`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#F8E48B'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+            <Link href={`/${lang}/pricing-table`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#DE3B34'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
               {t.pricing}
             </Link>
-            <Link href={`/${lang}/about`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#F8E48B'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+            <Link href={`/${lang}/blogs`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#DE3B34'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+              {t.blogs}
+            </Link>
+            <Link href={`/${lang}/about`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#DE3B34'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
               {t.whoAreWe}
             </Link>
-            <Link href={`/${lang}/contact`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#F8E48B'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+            <Link href={`/${lang}/contact`} className="text-sm font-medium text-white transition-colors whitespace-nowrap" style={{color: 'white'}} onMouseEnter={(e) => e.currentTarget.style.color = '#DE3B34'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
               {t.contactUs}
             </Link>
           </div>
@@ -107,7 +253,7 @@ export default function Navbar({ locale }: NavbarProps) {
                 style={
                   lang === 'en'
                     ? {
-                        background: 'linear-gradient(180deg, #F8DC71 0%, #E7BC3A 56%, #D49D1F 100%)',
+                        background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
                         boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -2px 0 rgba(120,78,0,0.35), 0 2px 8px rgba(0,0,0,0.35)',
                       }
                     : undefined
@@ -129,7 +275,7 @@ export default function Navbar({ locale }: NavbarProps) {
                 style={
                   lang === 'ar'
                     ? {
-                        background: 'linear-gradient(180deg, #F8DC71 0%, #E7BC3A 56%, #D49D1F 100%)',
+                        background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
                         boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -2px 0 rgba(120,78,0,0.35), 0 2px 8px rgba(0,0,0,0.35)',
                       }
                     : undefined
@@ -143,19 +289,37 @@ export default function Navbar({ locale }: NavbarProps) {
               </button>
             </div>
 
-            <Link 
-              href="https://wa.me/97142648831?text=Hello%2C%20I%20would%20like%20to%20get%20a%20consultation%20for%20accounting%20services"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl"
-              style={{backgroundColor: '#F8E48B', color: '#181818'}}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F2D56D'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F8E48B'}
+            <button
+              type="button"
+              onClick={() => currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true)}
+              className="font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl"
+              style={{
+                backgroundColor: '#000000',
+                color: '#ffffff',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1a1a1a'
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#000000'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)'
+              }}
             >
               <span>👤</span>
-              <span className="hidden xs:inline md:inline">{lang === 'en' ? 'GET A CONSULTATION' : 'احجز استشارة'}</span>
-              <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Consult' : 'استشارة'}</span>
-            </Link>
+              {currentUser ? (
+                <>
+                  <span className="hidden xs:inline md:inline">{lang === 'en' ? 'DASHBOARD' : 'لوحة التحكم'}</span>
+                  <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Portal' : 'بوابة'}</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden xs:inline md:inline">{lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب'}</span>
+                  <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Login' : 'دخول'}</span>
+                </>
+              )}
+            </button>
 
             {/* Mobile Menu Button */}
             <button
@@ -219,6 +383,16 @@ export default function Navbar({ locale }: NavbarProps) {
                 {t.whoAreWe}
               </Link>
               <Link
+                href={`/${lang}/blogs`}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-2 text-sm font-medium text-white rounded transition-colors"
+                style={{}}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(128, 128, 128, 0.3)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                {t.blogs}
+              </Link>
+              <Link
                 href={`/${lang}/contact`}
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-4 py-2 text-sm font-medium text-white rounded transition-colors"
@@ -242,7 +416,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   style={
                     lang === 'en'
                       ? {
-                          background: 'linear-gradient(180deg, #F8DC71 0%, #E7BC3A 56%, #D49D1F 100%)',
+                          background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
                           boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.5), inset 0 -2px 0 rgba(120,78,0,0.35)',
                         }
                       : undefined
@@ -266,7 +440,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   style={
                     lang === 'ar'
                       ? {
-                          background: 'linear-gradient(180deg, #F8DC71 0%, #E7BC3A 56%, #D49D1F 100%)',
+                          background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
                           boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.5), inset 0 -2px 0 rgba(120,78,0,0.35)',
                         }
                       : undefined
@@ -278,13 +452,134 @@ export default function Navbar({ locale }: NavbarProps) {
                   <span className="relative z-10">AR</span>
                 </button>
               </div>
-              <button className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-4 py-2 rounded text-sm transition-colors mt-2">
-                {lang === 'en' ? 'GET A CONSULTATION' : 'احجز استشارة'}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true);
+                }}
+                className="block w-full rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all duration-200 mt-2 text-center shadow-[0_8px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.4)]"
+                style={{
+                  backgroundColor: '#000000'
+                }}
+              >
+                {currentUser ? (lang === 'en' ? 'DASHBOARD' : 'لوحة التحكم') : (lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب')}
               </button>
             </div>
           </div>
         )}
       </div>
+
     </nav>
+    {authModalOpen && (
+      <div
+        className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 px-4"
+        onClick={() => setAuthModalOpen(false)}
+      >
+        <div
+          className="w-full max-w-3xl flex rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(22,10,10,0.35)]"
+          onClick={(e) => e.stopPropagation()}
+          dir={lang === 'ar' ? 'rtl' : 'ltr'}
+        >
+          {/* Left: Red Gradient Brand Side */}
+          <div className="hidden md:flex w-1/2 bg-gradient-to-br from-[#DE3B34] to-[#9B0F09] p-14 flex-col justify-center items-center text-center text-white relative">
+            <div className="mb-16 px-2 py-4">
+              <Image src={Logo} alt="Almahy Logo" width={160} height={60} className="object-contain" />
+            </div>
+            <h2 className="text-4xl font-bold mb-5">Welcome Back</h2>
+            <p className="text-white/85 text-sm leading-relaxed max-w-xs">
+              Sign in to your portal to access your account, manage transactions, and view your financial information securely.
+            </p>
+          </div>
+
+          {/* Right: Form Side */}
+          <div className="w-full md:w-1/2 bg-white p-8 md:p-10 relative">
+            <button
+              type="button"
+              className="absolute top-3 right-3 md:hidden text-slate-500 hover:text-[#160A0A] text-2xl leading-none"
+              onClick={() => setAuthModalOpen(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            
+            <div className="md:hidden mb-6 text-center">
+              <div className="mx-auto mb-4 w-fit px-3 py-3">
+                <Image src={Logo} alt="Almahy Logo" width={150} height={56} className="object-contain" />
+              </div>
+            </div>
+
+            <div className="mb-7">
+              <h3 className="text-2xl font-bold text-slate-900">Almahy Portal Login</h3>
+              <p className="text-slate-600 text-sm mt-2">{authText.subtitle}</p>
+            </div>
+
+          <form
+            className="space-y-5"
+            onSubmit={(e) => {
+              e.preventDefault();
+              runAuthAction('login');
+            }}
+          >
+            <input
+              type="text"
+              placeholder={authText.contact}
+              className="w-full rounded-xl border-2 border-[#CECDCB] bg-white px-4 py-3.5 text-slate-900 placeholder:text-slate-400 placeholder:font-medium outline-none transition-all focus:border-[#DE3B34] focus:shadow-[0_0_0_3px_rgba(222,59,52,0.1)]"
+              value={authContact}
+              onChange={(e) => setAuthContact(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder={authText.password}
+              className="w-full rounded-xl border-2 border-[#CECDCB] bg-white px-4 py-3.5 text-slate-900 placeholder:text-slate-400 placeholder:font-medium outline-none transition-all focus:border-[#DE3B34] focus:shadow-[0_0_0_3px_rgba(222,59,52,0.1)]"
+              value={authPassword}
+              onChange={(e) => setAuthPassword(e.target.value)}
+            />
+            {authFeedback ? (
+              <p className={`text-sm ${authFeedback.type === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>
+                {authFeedback.message}
+              </p>
+            ) : null}
+            <button
+              type="submit"
+              disabled={authLoading}
+              className="w-full rounded-xl py-3.5 font-bold text-white transition-all duration-200 disabled:opacity-70 shadow-[0_8px_18px_rgba(22,10,10,0.25)] hover:shadow-[0_10px_22px_rgba(22,10,10,0.32)]"
+              style={{
+                backgroundColor: '#DE3B34'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#C93028'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#DE3B34'}
+            >
+              {authLoading ? (lang === 'ar' ? 'جارٍ المعالجة...' : 'Processing...') : authText.login}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                void runGoogleSignIn();
+              }}
+              disabled={authLoading}
+              className="w-full rounded-xl border-2 border-[#CECDCB] bg-white py-3 font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.4l2.6-2.5C16.8 3.4 14.6 2.5 12 2.5 6.8 2.5 2.5 6.8 2.5 12S6.8 21.5 12 21.5c6.9 0 9.2-4.8 9.2-7.3 0-.5-.1-.9-.1-1.3H12z"/>
+              </svg>
+              {authText.google}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                void runAuthAction('register');
+              }}
+              disabled={authLoading}
+              className="w-full rounded-xl border-2 border-[#DE3B34] bg-white py-3 font-bold text-[#DE3B34] hover:bg-[#FFB6B6]/20 transition-all"
+            >
+              {authText.register}
+            </button>
+          </form>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

@@ -27,7 +27,7 @@ export default function AboutSectionWithVideo({ t, isRTL }: AboutSectionWithVide
               className="w-full h-full"
             />
             <button className="absolute top-2 right-2 bg-white/80 hover:bg-white rounded-full p-2" onClick={() => setShowVideo(false)}>
-              <svg width="24" height="24" fill="none" stroke="#222" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6"/></svg>
+              <svg width="24" height="24" fill="none" stroke="#160A0A" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6"/></svg>
             </button>
           </div>
         </div>
@@ -43,12 +43,12 @@ export default function AboutSectionWithVideo({ t, isRTL }: AboutSectionWithVide
               aria-label="Play video"
             >
               <span className="bg-white/90 rounded-full p-5 shadow-xl border-2 border-gray-200">
-                <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#fff"/><polygon points="15,13 25,18 15,23" fill="#b49a87"/></svg>
+                <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#fff"/><polygon points="15,13 25,18 15,23" fill="#CECDCB"/></svg>
               </span>
             </button>
           </div>
-          <blockquote className="text-[#b49a87] italic text-base max-w-xs text-center flex flex-col items-center gap-2 font-serif" style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }}>
-            {/* <svg className="w-7 h-7 mx-auto" fill="none" stroke="#b49a87" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4z"/></svg> */}
+          <blockquote className="text-[#CECDCB] italic text-base max-w-xs text-center flex flex-col items-center gap-2 font-serif" style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }}>
+            {/* <svg className="w-7 h-7 mx-auto" fill="none" stroke="#CECDCB" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4z"/></svg> */}
             <span>
               {t.aboutTestimonial}
             </span>
@@ -59,10 +59,10 @@ export default function AboutSectionWithVideo({ t, isRTL }: AboutSectionWithVide
           {/* About Us image and label */}
           <div className="flex items-center gap-4 mb-2">
             {/* <img src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?auto=format&fit=crop&w=400&q=80" alt="Legal Team" className="w-24 h-16 object-cover rounded-xl shadow" /> */}
-            <span className="text-xs font-semibold tracking-widest text-[#b49a87] uppercase">{t.aboutUsLabel || 'About Us'}</span>
+            <span className="text-xs font-semibold tracking-widest text-[#CECDCB] uppercase">{t.aboutUsLabel || 'About Us'}</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-serif font-normal text-[#222] mb-2 leading-tight" style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}>{t.aboutHeadline}</h2>
-          <hr className="w-20 border-t-2 border-[#b49a87] mb-4" />
+          <h2 className="text-4xl md:text-5xl font-serif font-normal text-[#160A0A] mb-2 leading-tight" style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}>{t.aboutHeadline}</h2>
+          <hr className="w-20 border-t-2 border-[#CECDCB] mb-4" />
           <p className="text-gray-700 text-lg leading-relaxed mb-2 max-w-2xl font-serif" style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}>
             {t.aboutDescription}
           </p>

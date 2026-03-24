@@ -89,10 +89,10 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-[#1c1e2b] to-[#242735] text-white p-6 flex items-center justify-between border-b border-gray-200">
+        <div className="sticky top-0 bg-gradient-to-r from-[#160A0A] to-[#160A0A] text-white p-6 flex items-center justify-between border-b border-gray-200">
           <div>
             <h2 className="text-2xl font-bold">Get Started</h2>
-            <p className="text-sm text-gray-300 mt-1">Plan: <span className="text-[#d4a574] font-semibold">{planName}</span></p>
+            <p className="text-sm text-gray-300 mt-1">Plan: <span className="text-[#DE3B34] font-semibold">{planName}</span></p>
           </div>
           <button
             onClick={onClose}
@@ -119,7 +119,7 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
                 onChange={handleInputChange}
                 required
                 placeholder="Enter your full name"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4a574] transition-all bg-white text-gray-900 placeholder-gray-600 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3B34] transition-all bg-white text-gray-900 placeholder-gray-600 ${
                   errors.fullName ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -140,7 +140,7 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
                 onChange={handleInputChange}
                 required
                 placeholder="Enter your email"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4a574] transition-all bg-white text-gray-900 placeholder-gray-600 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3B34] transition-all bg-white text-gray-900 placeholder-gray-600 ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -161,7 +161,7 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
                 onChange={handleInputChange}
                 required
                 placeholder="+971 ..."
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4a574] transition-all bg-white text-gray-900 placeholder-gray-600 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3B34] transition-all bg-white text-gray-900 placeholder-gray-600 ${
                   errors.phone ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -181,7 +181,7 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
                 value={formData.company}
                 onChange={handleInputChange}
                 placeholder="Enter your company name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4a574] focus:border-transparent transition-all bg-white text-gray-900 placeholder-gray-600"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3B34] focus:border-transparent transition-all bg-white text-gray-900 placeholder-gray-600"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
               onChange={handleInputChange}
               placeholder="Tell us more about your requirements..."
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4a574] focus:border-transparent transition-all resize-none bg-white text-gray-900 placeholder-gray-600"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3B34] focus:border-transparent transition-all resize-none bg-white text-gray-900 placeholder-gray-600"
             />
           </div>
 
@@ -220,7 +220,7 @@ export default function FormModal({ isOpen, onClose, planName }: FormModalProps)
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-[#d4a574] hover:bg-[#c9985f] text-white font-semibold rounded-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-[#DE3B34] hover:bg-[#FFB6B6] text-white font-semibold rounded-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>

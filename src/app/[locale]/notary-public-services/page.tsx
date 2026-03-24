@@ -82,7 +82,7 @@ export default async function NotaryPublicServicesPage({
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-[#171f2f]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-[#160A0A]" />
         <div className="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-amber-500/20 blur-3xl" />
         <div className="absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-blue-500/15 blur-3xl" />
 
@@ -139,7 +139,7 @@ export default async function NotaryPublicServicesPage({
       </section>
 
       <section className="max-w-6xl mx-auto px-4 md:px-8 pb-20">
-        <div className="rounded-3xl border border-amber-100/20 bg-gradient-to-br from-[#1b2030] via-[#151c2b] to-[#101827] p-6 md:p-8">
+        <div className="rounded-3xl border border-amber-100/20 bg-gradient-to-br from-[#160A0A] via-[#160A0A] to-[#160A0A] p-6 md:p-8">
           <h2 className="text-3xl md:text-4xl font-bold text-amber-200 mb-3">Wills</h2>
           <p className="text-slate-300 mb-6">
             Structured will drafting services in line with UAE legal requirements and practical family protection needs.

@@ -69,7 +69,7 @@ export default async function AboutPage({
       <div className="relative h-[400px] flex items-center justify-center bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 text-center px-4">
-          <p className="font-semibold mb-2 tracking-wider uppercase text-sm" style={{color: '#F8E48B'}}>
+          <p className="font-semibold mb-2 tracking-wider uppercase text-sm" style={{color: '#DE3B34'}}>
             {lang === 'en' ? 'We Define The Success' : 'نحدد النجاح'}
           </p>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
@@ -82,7 +82,7 @@ export default async function AboutPage({
             <Link 
               href={`/${lang}/contact`}
               className="text-gray-900 font-bold px-8 py-3 rounded-full transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
-              style={{backgroundColor: '#F8E48B'}}
+              style={{backgroundColor: '#DE3B34'}}
             >
               📅 {lang === 'en' ? 'Book Free Consultation' : 'احجز استشارة مجانية'}
             </Link>
@@ -102,7 +102,7 @@ export default async function AboutPage({
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div>
-              <p className="font-semibold mb-3 tracking-wide uppercase text-sm" style={{color: '#F2D56D'}}>
+              <p className="font-semibold mb-3 tracking-wide uppercase text-sm" style={{color: '#FFB6B6'}}>
                 {lang === 'en' ? 'Welcome To Our Law Associates' : 'مرحبا بكم في شركة المحاماة'}
               </p>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
@@ -121,19 +121,19 @@ export default async function AboutPage({
                   {lang === 'en' ? 'Our Core Values' : 'قيمنا الأساسية'}
                 </h3>
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
+                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
                   <p className="text-gray-700 font-medium">{lang === 'en' ? 'Committed to delivering the finest' : 'ملتزمون بتقديم الأفضل'}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
+                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
                   <p className="text-gray-700 font-medium">{lang === 'en' ? 'Honest and transparent services' : 'خدمات صادقة وشفافة'}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
+                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
                   <p className="text-gray-700 font-medium">{lang === 'en' ? 'High marks of trust, business trust & integrity' : 'ثقة عالية ونزاهة'}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
+                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
                   <p className="text-gray-700 font-medium">{lang === 'en' ? 'Service' : 'خدمة'}</p>
                 </div>
               </div>
@@ -149,7 +149,7 @@ export default async function AboutPage({
                 />
               </div>
               {/* Decorative element */}
-              <div className="absolute -bottom-8 -left-8 w-48 h-48 rounded-2xl -z-10" style={{backgroundColor: '#F8E48B'}}></div>
+              <div className="absolute -bottom-8 -left-8 w-48 h-48 rounded-2xl -z-10" style={{backgroundColor: '#DE3B34'}}></div>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default async function AboutPage({
                 />
               </div>
               {/* Decorative element */}
-              <div className="absolute -top-8 -right-8 w-48 h-48 rounded-2xl -z-10" style={{backgroundColor: '#BF9C4A'}}></div>
+              <div className="absolute -top-8 -right-8 w-48 h-48 rounded-2xl -z-10" style={{backgroundColor: '#CECDCB'}}></div>
             </div>
 
             {/* Right Content */}
@@ -216,13 +216,13 @@ export default async function AboutPage({
               {t.whyChooseTitle}
             </h2>
             <div className="flex justify-center">
-              <div className="h-1 w-24 rounded" style={{backgroundColor: '#F8E48B'}}></div>
+              <div className="h-1 w-24 rounded" style={{backgroundColor: '#DE3B34'}}></div>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#F8E48B'}}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#DE3B34'}}>
                 ⚖️
               </div>
               <h4 className="font-bold text-xl text-gray-900 mb-3">{t.why1Title}</h4>
@@ -230,7 +230,7 @@ export default async function AboutPage({
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#F8E48B'}}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#DE3B34'}}>
                 🌍
               </div>
               <h4 className="font-bold text-xl text-gray-900 mb-3">{t.why2Title}</h4>
@@ -238,7 +238,7 @@ export default async function AboutPage({
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#F8E48B'}}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#DE3B34'}}>
                 💼
               </div>
               <h4 className="font-bold text-xl text-gray-900 mb-3">{t.why3Title}</h4>
@@ -246,7 +246,7 @@ export default async function AboutPage({
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#F8E48B'}}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-6" style={{backgroundColor: '#DE3B34'}}>
                 🤝
               </div>
               <h4 className="font-bold text-xl text-gray-900 mb-3">{t.why4Title}</h4>
@@ -260,14 +260,14 @@ export default async function AboutPage({
       <div className="py-24 px-4 md:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14 md:mb-16">
-            <p className="font-semibold tracking-[0.16em] uppercase text-xs mb-3" style={{color: '#BF9C4A'}}>
+            <p className="font-semibold tracking-[0.16em] uppercase text-xs mb-3" style={{color: '#CECDCB'}}>
               {lang === 'en' ? 'Professional Experts' : 'خبراء محترفون'}
             </p>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {lang === 'en' ? 'Our Team' : 'فريقنا'}
             </h2>
             <div className="flex justify-center">
-              <div className="h-[3px] w-20 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
+              <div className="h-[3px] w-20 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
             </div>
             <p className="text-gray-600 text-base md:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
               {lang === 'en' ? 'Meet our dedicated staff who drive our success.' : 'تعرف على فريق العمل المتميز لدينا.'}
@@ -309,7 +309,7 @@ export default async function AboutPage({
           <Link 
             href={`/${lang}/contact`}
             className="inline-block text-gray-900 font-bold px-10 py-4 rounded-full transition-all shadow-lg hover:shadow-xl text-lg"
-            style={{backgroundColor: '#F8E48B'}}
+            style={{backgroundColor: '#DE3B34'}}
           >
             {lang === 'en' ? 'CONNECT WITH US!' : 'تواصل معنا!'}
           </Link>

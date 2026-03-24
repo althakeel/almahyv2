@@ -78,7 +78,7 @@ export default async function ExpertReportsPage({
   const c = content[lang];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#181c23] to-[#23272f] py-0 px-0" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-gradient-to-b from-[#160A0A] to-[#160A0A] py-0 px-0" dir={isRTL ? "rtl" : "ltr"}>
       {/* Hero Section */}
       <div className="relative w-full h-[320px] md:h-[420px] flex items-center justify-center overflow-hidden">
         <Image src="/assets/expert-reports/hero-dark.jpg" alt="Expert Reports Banner" fill priority className="object-cover w-full h-full brightness-[.55]" />
@@ -94,18 +94,18 @@ export default async function ExpertReportsPage({
           <p className="text-gray-200 mb-6" dangerouslySetInnerHTML={{ __html: c.servicesDesc }} />
           <div className="grid md:grid-cols-2 gap-8">
             <div className="flex flex-col gap-6 justify-center">
-              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#23272f] to-[#181c23] aspect-[4/3] flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#160A0A] to-[#160A0A] aspect-[4/3] flex items-center justify-center">
                 <Image src="https://images.unsplash.com/photo-1556740772-1a741367b93e?auto=format&fit=crop&w=600&q=80" alt="Financial Analysis" fill className="object-cover w-full h-full" />
               </div>
-              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#23272f] to-[#181c23] aspect-[4/3] flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#160A0A] to-[#160A0A] aspect-[4/3] flex items-center justify-center">
                 <Image src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80" alt="Legal Expert" fill className="object-cover w-full h-full" />
               </div>
             </div>
             <div className="flex flex-col gap-6 justify-center">
-              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#23272f] to-[#181c23] aspect-[4/3] flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#160A0A] to-[#160A0A] aspect-[4/3] flex items-center justify-center">
                 <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80" alt="Forensic Accounting" fill className="object-cover w-full h-full" />
               </div>
-              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#23272f] to-[#181c23] aspect-[4/3] flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#160A0A] to-[#160A0A] aspect-[4/3] flex items-center justify-center">
                 <Image src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80" alt="Arbitration" fill className="object-cover w-full h-full" />
               </div>
             </div>

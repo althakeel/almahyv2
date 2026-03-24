@@ -80,7 +80,7 @@ function StatCard({ number, label, suffix = '' }: StatProps) {
       <div className="relative text-center py-14 px-6 flex flex-col items-center justify-center h-full">
         <div
           className="text-2xl md:text-5xl lg:text-7xl font-extrabold mb-4 tracking-tight drop-shadow"
-          style={{ fontFamily: 'Georgia, serif', color: '#C9A227', textShadow: '0 2px 8px rgba(201,162,39,0.10)' }}
+          style={{ fontFamily: 'Georgia, serif', color: '#DE3B34', textShadow: '0 2px 8px rgba(201,162,39,0.10)' }}
         >
           {displayValue()}
         </div>

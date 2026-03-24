@@ -110,8 +110,8 @@ export default function ServicesSection({ locale }: ServicesSectionProps) {
         
         {/* Decorative Elements */}
         <div className="absolute inset-0 overflow-hidden opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-pulse" style={{backgroundColor: '#F8E48B'}}></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{backgroundColor: '#BF9C4A'}}></div>
+          <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-pulse" style={{backgroundColor: '#DE3B34'}}></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{backgroundColor: '#CECDCB'}}></div>
         </div>
 
         <div className="relative px-4 md:px-8">
@@ -119,10 +119,10 @@ export default function ServicesSection({ locale }: ServicesSectionProps) {
             {/* Title with decorative elements */}
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-5 py-2 backdrop-blur-sm rounded-full mb-6" style={{backgroundColor: 'rgba(248, 228, 139, 0.1)', border: '1px solid rgba(248, 228, 139, 0.2)'}}>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F8E48B'}}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#DE3B34'}}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span className="font-semibold text-sm" style={{color: '#F8E48B'}}>
+                <span className="font-semibold text-sm" style={{color: '#DE3B34'}}>
                   {locale === 'en' ? 'What We Offer' : 'ما نقدمه'}
                 </span>
               </div>
@@ -131,9 +131,9 @@ export default function ServicesSection({ locale }: ServicesSectionProps) {
               </h2>
               <div className="flex justify-center mt-6">
                 <div className="flex items-center gap-2">
-                  <div className="h-1 w-12 rounded" style={{backgroundColor: '#F8E48B'}}></div>
-                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
-                  <div className="h-1 w-12 rounded" style={{backgroundColor: '#F8E48B'}}></div>
+                  <div className="h-1 w-12 rounded" style={{backgroundColor: '#DE3B34'}}></div>
+                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
+                  <div className="h-1 w-12 rounded" style={{backgroundColor: '#DE3B34'}}></div>
                 </div>
               </div>
             </div>
@@ -161,7 +161,7 @@ export default function ServicesSection({ locale }: ServicesSectionProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
                     {/* Icon Badge */}
-                    <div className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12" style={{backgroundColor: '#BF9C4A'}}>
+                    <div className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12" style={{backgroundColor: '#CECDCB'}}>
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {index === 0 && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />}
                         {index === 1 && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />}
@@ -175,8 +175,8 @@ export default function ServicesSection({ locale }: ServicesSectionProps) {
                   <div className="p-6 md:p-7">
                     {/* Title with accent */}
                     <div className="flex items-start gap-3 mb-4">
-                      <div className="w-1 h-8 rounded-full flex-shrink-0" style={{backgroundColor: '#F8E48B'}}></div>
-                      <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-tight transition-colors duration-300" style={{color: '#181818'}} onMouseEnter={(e) => {e.currentTarget.style.color = '#BF9C4A'}} onMouseLeave={(e) => {e.currentTarget.style.color = '#181818'}}>
+                      <div className="w-1 h-8 rounded-full flex-shrink-0" style={{backgroundColor: '#DE3B34'}}></div>
+                      <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-tight transition-colors duration-300" style={{color: '#160A0A'}} onMouseEnter={(e) => {e.currentTarget.style.color = '#CECDCB'}} onMouseLeave={(e) => {e.currentTarget.style.color = '#160A0A'}}>
                         {service.title}
                       </h3>
                     </div>
@@ -187,7 +187,7 @@ export default function ServicesSection({ locale }: ServicesSectionProps) {
                     </p>
 
                     {/* Learn More Link */}
-                    <div className="flex items-center gap-2 font-semibold text-sm group-hover:gap-3 transition-all duration-300" style={{color: '#F2D56D'}} onMouseEnter={(e) => {e.currentTarget.style.color = '#BF9C4A'}} onMouseLeave={(e) => {e.currentTarget.style.color = '#F2D56D'}}>
+                    <div className="flex items-center gap-2 font-semibold text-sm group-hover:gap-3 transition-all duration-300" style={{color: '#FFB6B6'}} onMouseEnter={(e) => {e.currentTarget.style.color = '#CECDCB'}} onMouseLeave={(e) => {e.currentTarget.style.color = '#FFB6B6'}}>
                       <span>{locale === 'en' ? 'Learn More' : 'اعرف المزيد'}</span>
                       <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />

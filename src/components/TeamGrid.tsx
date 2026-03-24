@@ -55,7 +55,7 @@ export default function TeamGrid() {
     <section className="relative mx-auto max-w-7xl px-6 py-12 sm:px-10 lg:px-12">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d4a574]">Our Team</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#DE3B34]">Our Team</p>
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">People who guide your matters</h2>
           <p className="max-w-2xl text-sm text-white/70 sm:text-base">
             Meet the multidisciplinary team delivering strategy, advocacy, and client care across arbitration, litigation, corporate, and private client matters.

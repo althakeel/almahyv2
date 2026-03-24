@@ -3,11 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 
 const palette = {
-  primary: "#F8E48B",
-  secondary: "#F2D56D",
-  accent: "#BF9C4A",
-  muted: "#808080",
-  dark: "#181818",
+  primary: "#DE3B34",
+  secondary: "#FFB6B6",
+  accent: "#CECDCB",
+  muted: "#CECDCB",
+  dark: "#160A0A",
 };
 
 const countries = [
@@ -543,7 +543,7 @@ export default async function SecondPassportPage({
                   {isArabic ? country.arSummary : country.enSummary}
                 </p>
                 <span
-                  className="inline-flex items-center font-semibold px-4 py-2 border transition-colors duration-200 group-hover:bg-[#F8E48B1A]"
+                  className="inline-flex items-center font-semibold px-4 py-2 border transition-colors duration-200 group-hover:bg-[#DE3B341A]"
                   style={{
                     backgroundColor: `${palette.primary}00`,
                     borderColor: `${palette.accent}55`,

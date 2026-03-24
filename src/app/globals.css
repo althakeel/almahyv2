@@ -1,8 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Mizra";
+  src: local("Mizra"), local("Mizra Regular");
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F1EFF0;
+  --foreground: #160A0A;
+  --color-primary: #DE3B34;
+  --color-secondary: #FFB6B6;
+  --color-surface: #F1EFF0;
+  --color-muted: #CECDCB;
+  --color-dark: #160A0A;
 }
 
 /* Removed unsupported `@theme` at-rule (not standard CSS).
@@ -11,8 +23,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #160A0A;
+    --foreground: #F1EFF0;
   }
 }
 
@@ -23,8 +35,8 @@ body {
 }
 
 body {
-  --sb-track-color: #232E33;
-  --sb-thumb-color: #6BAF8D;
+  --sb-track-color: #CECDCB;
+  --sb-thumb-color: #DE3B34;
   --sb-size: 0px;
 }
 

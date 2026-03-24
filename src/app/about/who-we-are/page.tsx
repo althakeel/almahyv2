@@ -54,19 +54,19 @@ export const metadata: Metadata = {
 
 function WhoWeArePage() {
   return (
-    <div className="bg-[#0b0f1c] text-white">
+    <div className="bg-[#160A0A] text-white">
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 opacity-60" aria-hidden>
-          <div className="absolute left-16 top-10 h-40 w-40 rounded-full bg-[#d4a574]/25 blur-3xl" />
+          <div className="absolute left-16 top-10 h-40 w-40 rounded-full bg-[#DE3B34]/25 blur-3xl" />
           <div className="absolute right-10 top-0 h-48 w-48 rounded-full bg-cyan-500/20 blur-3xl" />
           <div className="absolute left-1/2 bottom-[-80px] h-72 w-72 -translate-x-1/2 rounded-full bg-emerald-500/14 blur-3xl" />
         </div>
 
         <section className="relative mx-auto max-w-6xl px-6 pb-16 pt-16 sm:px-10 lg:px-12">
-          <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#d4a574]">
-            <span className="h-px w-8 bg-[#d4a574]/60" />
+          <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#DE3B34]">
+            <span className="h-px w-8 bg-[#DE3B34]/60" />
             History of Almahy
-            <span className="h-px w-8 bg-[#d4a574]/60" />
+            <span className="h-px w-8 bg-[#DE3B34]/60" />
           </div>
           <div className="mt-4 space-y-4 text-center">
             <h1 className="text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl lg:leading-[1.1]">
@@ -86,7 +86,7 @@ function WhoWeArePage() {
               key={item.title}
               className="rounded-2xl border border-white/10 bg-white/5 px-6 py-7 text-center shadow-[0_18px_45px_-22px_rgba(0,0,0,0.7)] backdrop-blur"
             >
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#0f172a] text-[#d4a574] ring-1 ring-white/12">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#160A0A] text-[#DE3B34] ring-1 ring-white/12">
                 {item.icon}
               </div>
               <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
@@ -128,7 +128,7 @@ function WhoWeArePage() {
         </div>
         <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-6 py-14 sm:px-10 lg:px-12 lg:flex-row lg:items-center lg:gap-16">
           <div className="flex-1 space-y-4">
-            <div className="inline-flex items-center gap-3 rounded-full bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#d4a574] ring-1 ring-white/10">
+            <div className="inline-flex items-center gap-3 rounded-full bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#DE3B34] ring-1 ring-white/10">
               Thanks for contacting us
             </div>
             <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">

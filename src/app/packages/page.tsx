@@ -161,7 +161,7 @@ export default function PackagesPage() {
         <section key={category} className="py-16 md:py-20">
           <div className="max-w-7xl mx-auto px-4 md:px-6">
             {/* Section Title */}
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4 underline decoration-[#d4a574] decoration-4 underline-offset-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4 underline decoration-[#DE3B34] decoration-4 underline-offset-8">
               {category === 'Legal Services' && 'Legal Packages'}
               {category === 'Corporate Services' && 'Corporate Packages'}
               {category === 'Debit Collection' && 'Debit Collection Packages'}
@@ -174,7 +174,7 @@ export default function PackagesPage() {
                   key={index}
                   className={`rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl ${
                     plan.featured
-                      ? 'bg-white shadow-2xl border-2 border-[#d4a574] transform md:scale-105'
+                      ? 'bg-white shadow-2xl border-2 border-[#DE3B34] transform md:scale-105'
                       : 'bg-white shadow-lg border border-gray-200 hover:shadow-xl'
                   }`}
                 >
@@ -204,7 +204,7 @@ export default function PackagesPage() {
                       {plan.features.map((feature, fIndex) => (
                         <div key={fIndex} className="flex items-start">
                           <svg
-                            className="w-5 h-5 text-[#d4a574] mr-3 flex-shrink-0 mt-0.5"
+                            className="w-5 h-5 text-[#DE3B34] mr-3 flex-shrink-0 mt-0.5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -224,7 +224,7 @@ export default function PackagesPage() {
                     {/* CTA Button */}
                     <button 
                       onClick={() => openForm(plan.name)}
-                      className="w-full py-3 px-6 border-2 border-[#d4a574] text-[#d4a574] font-semibold rounded hover:bg-[#d4a574] hover:text-white transition-all duration-200 uppercase text-sm tracking-wide"
+                      className="w-full py-3 px-6 border-2 border-[#DE3B34] text-[#DE3B34] font-semibold rounded hover:bg-[#DE3B34] hover:text-white transition-all duration-200 uppercase text-sm tracking-wide"
                     >
                       Get Started
                     </button>
@@ -237,7 +237,7 @@ export default function PackagesPage() {
       ))}
 
       {/* CTA Section */}
-      <section className="bg-[#1c1e2b] text-white py-16 md:py-20">
+      <section className="bg-[#160A0A] text-white py-16 md:py-20">
         <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Need a Custom Package?
@@ -247,7 +247,7 @@ export default function PackagesPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block px-8 py-3 bg-[#d4a574] hover:bg-[#c9985f] text-white font-semibold rounded transition-all duration-200 uppercase tracking-wide shadow-lg"
+            className="inline-block px-8 py-3 bg-[#DE3B34] hover:bg-[#FFB6B6] text-white font-semibold rounded transition-all duration-200 uppercase tracking-wide shadow-lg"
           >
             Contact Our Sales Team
           </Link>

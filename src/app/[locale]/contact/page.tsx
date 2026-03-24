@@ -12,7 +12,7 @@ export default async function ContactPage({
 
   return (
     <>
-      <div className="bg-gradient-to-b from-[#0b0f1c] via-[#111827] to-[#0a0d17] text-white py-20 px-4 md:px-8">
+      <div className="bg-gradient-to-b from-[#160A0A] via-[#160A0A] to-[#160A0A] text-white py-20 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 pt-16">
@@ -21,9 +21,9 @@ export default async function ContactPage({
           </h1>
           <div className="flex justify-center mb-6">
             <div className="flex items-center gap-3">
-              <div className="h-1 w-12 rounded" style={{backgroundColor: '#F8E48B'}}></div>
-              <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#F8E48B'}}></div>
-              <div className="h-1 w-12 rounded" style={{backgroundColor: '#F8E48B'}}></div>
+              <div className="h-1 w-12 rounded" style={{backgroundColor: '#DE3B34'}}></div>
+              <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#DE3B34'}}></div>
+              <div className="h-1 w-12 rounded" style={{backgroundColor: '#DE3B34'}}></div>
             </div>
           </div>
           <p className="text-lg text-white/80 max-w-2xl mx-auto">
@@ -44,7 +44,7 @@ export default async function ContactPage({
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition focus:ring-4 focus:ring-[#F8E48B]/30"
+                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition focus:ring-4 focus:ring-[#DE3B34]/30"
                   placeholder={t.formNamePlaceholder}
                 />
               </div>
@@ -54,7 +54,7 @@ export default async function ContactPage({
                 </label>
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition focus:ring-4 focus:ring-[#F8E48B]/30"
+                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition focus:ring-4 focus:ring-[#DE3B34]/30"
                   placeholder={t.formEmailPlaceholder}
                 />
               </div>
@@ -64,7 +64,7 @@ export default async function ContactPage({
                 </label>
                 <input
                   type="tel"
-                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition focus:ring-4 focus:ring-[#F8E48B]/30"
+                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition focus:ring-4 focus:ring-[#DE3B34]/30"
                   placeholder={t.formPhonePlaceholder}
                 />
               </div>
@@ -74,14 +74,14 @@ export default async function ContactPage({
                 </label>
                 <textarea
                   rows={5}
-                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition resize-none focus:ring-4 focus:ring-[#F8E48B]/30"
+                  className="w-full px-4 py-3 border border-white/20 bg-white/5 text-white placeholder:text-white/50 rounded-lg focus:border-transparent outline-none transition resize-none focus:ring-4 focus:ring-[#DE3B34]/30"
                   placeholder={t.formMessagePlaceholder}
                 ></textarea>
               </div>
               <button
                 type="submit"
                 className="w-full text-gray-900 font-bold py-4 rounded-full transition-colors shadow-lg hover:brightness-110"
-                style={{backgroundColor: '#F8E48B'}}
+                style={{backgroundColor: '#DE3B34'}}
               >
                 {t.formSubmit}
               </button>
@@ -90,7 +90,7 @@ export default async function ContactPage({
 
           {/* Contact Information */}
           <div className="space-y-8">
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#F8E48B'}}>
+            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#DE3B34'}}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-4xl">📍</div>
                 <h3 className="text-xl font-bold text-white">{t.address}</h3>
@@ -102,35 +102,35 @@ export default async function ContactPage({
               </p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#BF9C4A'}}>
+            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#CECDCB'}}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-4xl">📧</div>
                 <h3 className="text-xl font-bold text-white">{t.email}</h3>
               </div>
               <p className="text-white/80">
-                <a href="mailto:info@almahy.com" className="transition" style={{color: '#F2D56D'}}>
+                <a href="mailto:info@almahy.com" className="transition" style={{color: '#FFB6B6'}}>
                   info@almahy.com
                 </a>
                 <br />
-                <a href="mailto:legal@almahy.com" className="transition" style={{color: '#F2D56D'}}>
+                <a href="mailto:legal@almahy.com" className="transition" style={{color: '#FFB6B6'}}>
                   legal@almahy.com
                 </a>
               </p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#808080'}}>
+            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#CECDCB'}}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-4xl">📞</div>
                 <h3 className="text-xl font-bold text-white">{t.phone}</h3>
               </div>
               <p className="text-white/80">
-                <a href="tel:+97142648831" className="transition text-lg font-semibold" style={{color: '#F2D56D'}}>
+                <a href="tel:+97142648831" className="transition text-lg font-semibold" style={{color: '#FFB6B6'}}>
                   +971 4264 8831
                 </a>
               </p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#181818'}}>
+            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl shadow-lg border-t-4" style={{borderTopColor: '#160A0A'}}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-4xl">🕒</div>
                 <h3 className="text-xl font-bold text-white">{t.hours}</h3>
@@ -146,14 +146,14 @@ export default async function ContactPage({
       </div>
 
       {/* Google Maps Section - Full Width */}
-      <div className="w-full bg-[#0a0d17] text-white">
+      <div className="w-full bg-[#160A0A] text-white">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-4">
               {lang === 'en' ? 'Find Us on the Map' : 'اعثر علينا على الخريطة'}
             </h2>
             <div className="flex justify-center">
-              <div className="h-1 w-20 rounded" style={{backgroundColor: '#F8E48B'}}></div>
+              <div className="h-1 w-20 rounded" style={{backgroundColor: '#DE3B34'}}></div>
             </div>
           </div>
         </div>

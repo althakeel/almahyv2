@@ -2,10 +2,10 @@ import { Locale } from "@/lib/translations";
 import Image from "next/image";
 
 const palette = {
-  primary: "#F8E48B",
-  secondary: "#F2D56D",
-  accent: "#BF9C4A",
-  dark: "#181818",
+  primary: "#DE3B34",
+  secondary: "#FFB6B6",
+  accent: "#CECDCB",
+  dark: "#160A0A",
 };
 
 type NewsItem = {
@@ -254,7 +254,7 @@ export default async function LegalServicesPage({
   return (
     <div className="min-h-screen w-full bg-slate-950 text-white">
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-[#161a22]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-[#160A0A]" />
         <div className="absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full blur-3xl opacity-20" style={{ backgroundColor: palette.accent }} />
 
         <div className="relative max-w-6xl mx-auto px-4 md:px-8 py-20 md:py-24">
@@ -364,7 +364,7 @@ export default async function LegalServicesPage({
       </section>
 
       <section id="legal-news" className="max-w-6xl mx-auto px-4 md:px-8 pb-20">
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-[#121826] p-6 md:p-8">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-[#160A0A] p-6 md:p-8">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: palette.primary }}>

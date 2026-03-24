@@ -1023,12 +1023,12 @@ export default async function SecondPassportCountryPage({
   const pageBgClass = isTurkiye
     ? "bg-white"
     : isPremiumCountry
-      ? "bg-[#111111]"
+      ? "bg-[#160A0A]"
       : "bg-gradient-to-b from-gray-50 to-white";
   const backLinkClass = isPremiumCountry
     ? isTurkiye
       ? "text-gray-600 hover:text-gray-900"
-      : "text-[#808080] hover:text-[#F8E48B]"
+      : "text-[#CECDCB] hover:text-[#DE3B34]"
     : "text-gray-600 hover:text-gray-900";
   const premiumTheme = isPremiumCountry
     ? isTurkiye
@@ -1037,29 +1037,29 @@ export default async function SecondPassportCountryPage({
           sectionBorder: "#E5E7EB",
           cardBorder: "#E5E7EB",
           accent: "#C08B2D",
-          heading: "#111827",
-          lead: "#1F2937",
+          heading: "#160A0A",
+          lead: "#160A0A",
           body: "#4B5563",
           muted: "#6B7280",
-          buttonBg: "#111827",
+          buttonBg: "#160A0A",
           buttonText: "#FFFFFF",
-          outline: "#111827",
+          outline: "#160A0A",
           heroOverlay: "linear-gradient(to left, rgba(255,255,255,0.15), rgba(255,255,255,0.85))",
           cardOverlay: "linear-gradient(to top, rgba(17,24,39,0.2), rgba(255,255,255,0.0))",
           processOverlay: "linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.75))",
         }
       : {
-          sectionBg: "#181818",
-          sectionBorder: "#BF9C4A66",
-          cardBorder: "#BF9C4A55",
-          accent: "#BF9C4A",
-          heading: "#F2D56D",
-          lead: "#F8E48B",
-          body: "#808080",
-          muted: "#808080",
-          buttonBg: "#F2D56D",
-          buttonText: "#181818",
-          outline: "#BF9C4A",
+          sectionBg: "#160A0A",
+          sectionBorder: "#CECDCB66",
+          cardBorder: "#CECDCB55",
+          accent: "#CECDCB",
+          heading: "#FFB6B6",
+          lead: "#DE3B34",
+          body: "#CECDCB",
+          muted: "#CECDCB",
+          buttonBg: "#FFB6B6",
+          buttonText: "#160A0A",
+          outline: "#CECDCB",
           heroOverlay: "linear-gradient(to left, rgba(24,24,24,0.2), rgba(24,24,24,0.75))",
           cardOverlay: "linear-gradient(to top, rgba(24,24,24,0.7), rgba(24,24,24,0.15))",
           processOverlay: "linear-gradient(to right, rgba(24,24,24,0.1), rgba(24,24,24,0.65))",
@@ -1139,7 +1139,7 @@ export default async function SecondPassportCountryPage({
             className={`rounded-2xl border p-6 ${isPremiumCountry ? "" : "bg-white border-gray-100 shadow"}`}
             style={isPremiumCountry ? { borderColor: premiumTheme?.cardBorder, backgroundColor: premiumTheme?.sectionBg } : undefined}
           >
-            <h2 className="text-xl font-bold mb-4" style={{ color: isPremiumCountry ? premiumTheme?.heading : "#111827" }}>
+            <h2 className="text-xl font-bold mb-4" style={{ color: isPremiumCountry ? premiumTheme?.heading : "#160A0A" }}>
               {isArabic ? "أهم المزايا" : "Key Benefits"}
             </h2>
             <ul className="space-y-3" style={{ color: isPremiumCountry ? premiumTheme?.body : "#374151" }}>
@@ -1156,7 +1156,7 @@ export default async function SecondPassportCountryPage({
             className={`rounded-2xl border p-6 ${isPremiumCountry ? "" : "bg-white border-gray-100 shadow"}`}
             style={isPremiumCountry ? { borderColor: premiumTheme?.cardBorder, backgroundColor: premiumTheme?.sectionBg } : undefined}
           >
-            <h2 className="text-xl font-bold mb-4" style={{ color: isPremiumCountry ? premiumTheme?.heading : "#111827" }}>
+            <h2 className="text-xl font-bold mb-4" style={{ color: isPremiumCountry ? premiumTheme?.heading : "#160A0A" }}>
               {isArabic ? "خيارات الاستثمار" : "Investment Routes"}
             </h2>
             <ul className="space-y-3" style={{ color: isPremiumCountry ? premiumTheme?.body : "#374151" }}>
@@ -1294,22 +1294,22 @@ export default async function SecondPassportCountryPage({
         </div>
 
         {(isAntigua || isStKitts) && premiumNews.length > 0 && (
-          <section className="mt-8 rounded-2xl border p-6" style={{ borderColor: "#BF9C4A55", backgroundColor: "#181818" }}>
-            <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: "#F2D56D" }}>
+          <section className="mt-8 rounded-2xl border p-6" style={{ borderColor: "#CECDCB55", backgroundColor: "#160A0A" }}>
+            <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: "#FFB6B6" }}>
               {isArabic ? "الأخبار والتحديثات" : "News & Updates"}
             </h3>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {premiumNews.map((news) => (
-                <article key={news.url} className="rounded-xl border overflow-hidden" style={{ borderColor: "#BF9C4A44", backgroundColor: "#111111" }}>
+                <article key={news.url} className="rounded-xl border overflow-hidden" style={{ borderColor: "#CECDCB44", backgroundColor: "#160A0A" }}>
                   <a href={news.url} target="_blank" rel="noopener noreferrer" aria-label={news.title}>
                     <img src={news.image} alt={news.title} className="w-full h-36 object-cover" loading="lazy" />
                   </a>
                   <div className="p-3">
-                    <a href={news.url} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "#F8E48B" }}>
+                    <a href={news.url} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "#DE3B34" }}>
                       <h4 className="font-semibold leading-snug line-clamp-3">{news.title}</h4>
                     </a>
-                    {news.source && <p className="text-xs mt-2" style={{ color: "#808080" }}>{news.source}</p>}
+                    {news.source && <p className="text-xs mt-2" style={{ color: "#CECDCB" }}>{news.source}</p>}
                   </div>
                 </article>
               ))}

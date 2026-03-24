@@ -414,7 +414,7 @@ export default async function CorporateServicesPage({
       </section>
 
       <section className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-10">
-        <div className="rounded-3xl border border-amber-100/20 bg-gradient-to-br from-[#1b2030] via-[#151c2b] to-[#101827] p-5 md:p-7">
+        <div className="rounded-3xl border border-amber-100/20 bg-gradient-to-br from-[#160A0A] via-[#160A0A] to-[#160A0A] p-5 md:p-7">
           <div className="mb-5">
             <h2 className="text-3xl md:text-4xl font-bold text-amber-200 mb-2">
               {isArabic ? "حلول المكاتب" : "Office Solutions"}

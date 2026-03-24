@@ -9,11 +9,11 @@ export default {
     extend: {
       colors: {
         'brand': {
-          'light': '#F8E48B',
-          'gold': '#F2D56D',
-          'bronze': '#BF9C4A',
-          'gray': '#808080',
-          'dark': '#181818',
+          'light': '#FFB6B6',
+          'gold': '#DE3B34',
+          'bronze': '#CECDCB',
+          'gray': '#CECDCB',
+          'dark': '#160A0A',
         }
       },
       keyframes: {
