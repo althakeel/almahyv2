@@ -67,7 +67,7 @@ export const translations = {
     email: "Email Us",
     phone: "Call Us",
     hours: "Business Hours",
-    hoursWeekdays: "Sunday - Thursday: 9:00 AM - 6:00 PM",
+    hoursWeekdays: "Sunday - Thursday: 9:00 AM - 7:00 PM",
     hoursWeekend: "Friday - Saturday: Closed",
     
     // Footer
