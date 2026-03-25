@@ -16,11 +16,11 @@ export default async function TermsPage({
       sections: [
         {
           title: "1. Introduction",
-          content: "Welcome to Gulf Star Accounting (\"Company\", \"we\", \"our\", \"us\"). These Terms and Conditions (\"Terms\") govern your use of our website alamhy.com and the services we provide. By accessing our website and using our services, you agree to be bound by these Terms. If you do not agree with any part of these Terms, you must not use our website or services."
+          content: "Welcome to Almahy Legal Services Accounting (\"Company\", \"we\", \"our\", \"us\"). These Terms and Conditions (\"Terms\") govern your use of our website alamhy.com and the services we provide. By accessing our website and using our services, you agree to be bound by these Terms. If you do not agree with any part of these Terms, you must not use our website or services."
         },
         {
           title: "2. Services",
-          content: "Gulf Star Accounting provides professional accounting, tax, auditing, and consulting services. The specific scope and terms of each service engagement will be defined in a separate service agreement or engagement letter. Our services are subject to applicable laws and professional standards in the United Arab Emirates."
+          content: "Almahy Legal Services Accounting provides professional accounting, tax, auditing, and consulting services. The specific scope and terms of each service engagement will be defined in a separate service agreement or engagement letter. Our services are subject to applicable laws and professional standards in the United Arab Emirates."
         },
         {
           title: "3. Professional Relationship",
@@ -36,11 +36,11 @@ export default async function TermsPage({
         },
         {
           title: "6. Intellectual Property",
-          content: "All content on this website, including text, graphics, logos, images, and software, is the property of Gulf Star Accounting or its licensors and is protected by UAE and international copyright laws. You may not reproduce, distribute, or create derivative works without our express written permission."
+          content: "All content on this website, including text, graphics, logos, images, and software, is the property of Almahy Legal Services Accounting or its licensors and is protected by UAE and international copyright laws. You may not reproduce, distribute, or create derivative works without our express written permission."
         },
         {
           title: "7. Limitation of Liability",
-          content: "To the fullest extent permitted by UAE law, Gulf Star Accounting shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website or services. Our total liability shall not exceed the fees paid for the specific service giving rise to the claim."
+          content: "To the fullest extent permitted by UAE law, Almahy Legal Services Accounting shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website or services. Our total liability shall not exceed the fees paid for the specific service giving rise to the claim."
         },
         {
           title: "8. User Obligations",
@@ -64,7 +64,7 @@ export default async function TermsPage({
         },
         {
           title: "13. Professional Standards",
-          content: "Gulf Star Accounting operates in accordance with International Financial Reporting Standards (IFRS), International Standards on Auditing (ISA), and all applicable UAE regulations including Federal Tax Authority requirements and Ministry of Economy guidelines."
+          content: "Almahy Legal Services Accounting operates in accordance with International Financial Reporting Standards (IFRS), International Standards on Auditing (ISA), and all applicable UAE regulations including Federal Tax Authority requirements and Ministry of Economy guidelines."
         },
         {
           title: "14. Data Retention",
@@ -72,7 +72,7 @@ export default async function TermsPage({
         },
         {
           title: "15. Contact Information",
-          content: "If you have any questions about these Terms and Conditions, please contact us at: Gulf Star Accounting, Dubai, United Arab Emirates. Phone: +971 4 264 8831. Email: info@alamhy.com"
+          content: "If you have any questions about these Terms and Conditions, please contact us at: Almahy Legal Services Accounting, Dubai, United Arab Emirates. Phone: +971 4 264 8831. Email: info@alamhy.com"
         }
       ]
     },

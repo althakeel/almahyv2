@@ -209,7 +209,7 @@ function getFallbackReviews(locale: Locale): Review[] {
         name: "Ahmed Al Mansoori",
         rating: 5,
         date: "2 weeks ago",
-        text: "Excellent accounting services! The team at Gulf Star Accounting helped us streamline our financial processes and ensure full compliance with UAE tax regulations. Highly professional and responsive.",
+        text: "Excellent accounting services! The team at Almahy Legal Services Accounting helped us streamline our financial processes and ensure full compliance with UAE tax regulations. Highly professional and responsive.",
         avatar: "AM"
       },
       {
@@ -233,7 +233,7 @@ function getFallbackReviews(locale: Locale): Review[] {
         name: "Emily Chen",
         rating: 5,
         date: "2 months ago",
-        text: "Professional and reliable! Gulf Star Accounting has been handling our bookkeeping and financial reporting for over a year. They're detail-oriented and provide valuable insights for our business growth.",
+        text: "Professional and reliable! Almahy Legal Services Accounting has been handling our bookkeeping and financial reporting for over a year. They're detail-oriented and provide valuable insights for our business growth.",
         avatar: "EC"
       },
       {

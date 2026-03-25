@@ -262,7 +262,7 @@ export default function Navbar({ locale }: NavbarProps) {
             href={`/${lang}`}
             className={`flex items-center gap-2 md:gap-3 cursor-pointer ${lang === 'ar' ? 'order-1' : 'order-1'}`}
           >
-            <Image src={Logo} alt="Gulf Star Logo" width={150} height={100} className="object-contain md:w-[150px] md:h-[55px]" priority />
+            <Image src={Logo} alt="Almahy Legal Services Logo" width={150} height={100} className="object-contain md:w-[150px] md:h-[55px]" priority />
           </Link>
 
           {/* Center: Navigation Links */}

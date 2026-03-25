@@ -16,7 +16,7 @@ export default async function PrivacyPage({
       sections: [
         {
           title: "1. Introduction",
-          content: "Gulf Star Accounting (\"we\", \"our\", \"us\") is committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website alamhy.com or use our professional services. We comply with the UAE Data Protection Laws and international privacy standards."
+          content: "Almahy Legal Services Accounting (\"we\", \"our\", \"us\") is committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website alamhy.com or use our professional services. We comply with the UAE Data Protection Laws and international privacy standards."
         },
         {
           title: "2. Information We Collect",
@@ -72,7 +72,7 @@ export default async function PrivacyPage({
         },
         {
           title: "15. Contact Information",
-          content: "If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us at: Gulf Star Accounting, Dubai, United Arab Emirates. Phone: +971 4 264 8831. Email: info@alamhy.com. We will respond to your inquiry within 30 days."
+          content: "If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us at: Almahy Legal Services Accounting, Dubai, United Arab Emirates. Phone: +971 4 264 8831. Email: info@alamhy.com. We will respond to your inquiry within 30 days."
         }
       ]
     },

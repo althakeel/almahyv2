@@ -32,7 +32,7 @@ const servicesData = {
       },
       {
         title: 'ACCOUNTING SERVICES',
-        description: 'Gulf Star Accounting provides accounting services through qualified professional accountants with extensive experience in the various activities of companies, and the success of any institution depends on the effectiveness of its accounting and financial system, and the competent professional accountant is the cornerstone of this system',
+        description: 'Almahy Legal Services Accounting provides accounting services through qualified professional accountants with extensive experience in the various activities of companies, and the success of any institution depends on the effectiveness of its accounting and financial system, and the competent professional accountant is the cornerstone of this system',
         image: '/assets/services/accounting.webp',
         url: '/accounting-services'
       },

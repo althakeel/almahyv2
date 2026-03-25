@@ -16,7 +16,7 @@ export default async function ProfessionalServicesPage({
       heroTitle: "Professional Services",
       heroSubtitle: "Strategic Management & Business Consulting for Growth",
       mainTitle: "Professional Consulting Solutions",
-      mainDesc: "At Gulf Star Accounting, we offer management consulting to various entities to help organizations improve their performance, primarily by analyzing problems, developing plans and solutions to improve existing organizations, and preparing organizational structures, tasks, responsibilities, and corporate strategies.",
+      mainDesc: "At Almahy Legal Services Accounting, we offer management consulting to various entities to help organizations improve their performance, primarily by analyzing problems, developing plans and solutions to improve existing organizations, and preparing organizational structures, tasks, responsibilities, and corporate strategies.",
       services: [
         { 
           icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
@@ -174,7 +174,7 @@ export default async function ProfessionalServicesPage({
           {/* Why Choose Us */}
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12">
             <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">
-              {lang === 'en' ? 'Why Choose Gulf Star Accounting?' : 'لماذا تختار الخليج ستار للمحاسبة؟'}
+              {lang === 'en' ? 'Why Choose Almahy Legal Services Accounting?' : 'لماذا تختار الخليج ستار للمحاسبة؟'}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {pageContent.whyChoose.map((item, index) => (

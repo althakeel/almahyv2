@@ -23,12 +23,13 @@ import {
 import {
   BlogPost,
   BlogsBannerCard,
+  loadBlogsPageBannerConfigFromCloud,
   readBlogsFromStorage,
   readBlogsPageBannerCardFromStorage,
   readBlogsPageBannerFromStorage,
+  saveBlogsPageBannerConfigToCloud,
   slugify,
   writeBlogsPageBannerCardToStorage,
-  writeBlogsPageBannerToStorage,
   writeBlogsToStorage,
 } from '@/lib/blogs';
 
@@ -154,12 +155,24 @@ export default function Dashboard() {
 
   useEffect(() => {
     setBlogs(readBlogsFromStorage());
+
+    const localCard = readBlogsPageBannerCardFromStorage();
     setBlogsPageBanner(readBlogsPageBannerFromStorage());
-    const card = readBlogsPageBannerCardFromStorage();
-    setBannerCardTitleEn(card.titleEn);
-    setBannerCardTitleAr(card.titleAr);
-    setBannerCardSubEn(card.subEn);
-    setBannerCardSubAr(card.subAr);
+    setBannerCardTitleEn(localCard.titleEn);
+    setBannerCardTitleAr(localCard.titleAr);
+    setBannerCardSubEn(localCard.subEn);
+    setBannerCardSubAr(localCard.subAr);
+
+    const loadCloudBannerConfig = async () => {
+      const cloudConfig = await loadBlogsPageBannerConfigFromCloud();
+      setBlogsPageBanner(cloudConfig.bannerUrl);
+      setBannerCardTitleEn(cloudConfig.card.titleEn);
+      setBannerCardTitleAr(cloudConfig.card.titleAr);
+      setBannerCardSubEn(cloudConfig.card.subEn);
+      setBannerCardSubAr(cloudConfig.card.subAr);
+    };
+
+    void loadCloudBannerConfig();
   }, []);
 
   useEffect(() => {
@@ -417,7 +430,17 @@ export default function Dashboard() {
       }
 
       setBlogsPageBanner(result.url);
-      writeBlogsPageBannerToStorage(result.url);
+      const card: BlogsBannerCard = {
+        titleEn: bannerCardTitleEn.trim(),
+        titleAr: bannerCardTitleAr.trim(),
+        subEn: bannerCardSubEn.trim(),
+        subAr: bannerCardSubAr.trim(),
+      };
+      await saveBlogsPageBannerConfigToCloud({
+        bannerUrl: result.url,
+        card,
+        updatedBy: user?.email || undefined,
+      });
       setBlogFeedback({
         type: 'success',
         message: locale === 'ar' ? 'تم رفع بانر صفحة المدونة بنجاح.' : 'Blogs page banner uploaded successfully.',
@@ -926,15 +949,25 @@ export default function Dashboard() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     const card: BlogsBannerCard = {
                       titleEn: bannerCardTitleEn.trim(),
                       titleAr: bannerCardTitleAr.trim(),
                       subEn: bannerCardSubEn.trim(),
                       subAr: bannerCardSubAr.trim(),
                     };
-                    writeBlogsPageBannerCardToStorage(card);
-                    setBlogFeedback({ type: 'success', message: locale === 'ar' ? 'تم حفظ نص البطاقة.' : 'Banner card text saved.' });
+                    try {
+                      await saveBlogsPageBannerConfigToCloud({
+                        bannerUrl: blogsPageBanner,
+                        card,
+                        updatedBy: user?.email || undefined,
+                      });
+                      setBlogFeedback({ type: 'success', message: locale === 'ar' ? 'تم حفظ نص البطاقة.' : 'Banner card text saved.' });
+                    } catch (error) {
+                      console.error('Save banner card text error:', error);
+                      writeBlogsPageBannerCardToStorage(card);
+                      setBlogFeedback({ type: 'error', message: locale === 'ar' ? 'تعذر حفظ النص على السحابة. تم حفظه محلياً.' : 'Failed to save card text to cloud. Saved locally instead.' });
+                    }
                   }}
                   className="mt-3 rounded-xl bg-[#DE3B34] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#9B0F09] transition-colors"
                 >

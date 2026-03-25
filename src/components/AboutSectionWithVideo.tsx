@@ -11,7 +11,7 @@ export default function AboutSectionWithVideo({ t, isRTL }: AboutSectionWithVide
   const videoRef = useRef(null);
   return (
     <section className="w-full flex justify-center pt-1 py-24 px-4 md:px-0 bg-white">
-      {/* Modal for YouTube video */}
+     
       {showVideo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowVideo(false)}>
           <div className="bg-black rounded-2xl shadow-lg overflow-hidden relative w-[90vw] max-w-2xl aspect-video" onClick={e => e.stopPropagation()}>

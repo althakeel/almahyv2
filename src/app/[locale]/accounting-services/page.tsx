@@ -15,7 +15,7 @@ export default async function AccountingServicesPage({
       heroTitle: "Accounting Services",
       heroSubtitle: "Comprehensive Financial Solutions for Your Business Success",
       mainTitle: "Professional Accounting Solutions",
-      mainDesc: "Gulf Star Accounting provides accounting services through qualified professional accountants with extensive experience in the various activities of companies. The success of any institution depends on the effectiveness of its accounting and financial system, and the competent professional accountant is the cornerstone of this system.",
+      mainDesc: "Almahy Legal Services Accounting provides accounting services through qualified professional accountants with extensive experience in the various activities of companies. The success of any institution depends on the effectiveness of its accounting and financial system, and the competent professional accountant is the cornerstone of this system.",
       services: [
         { 
           icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
@@ -173,7 +173,7 @@ export default async function AccountingServicesPage({
           {/* Why Choose Us */}
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12">
             <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">
-              {lang === 'en' ? 'Why Choose Gulf Star Accounting?' : 'لماذا تختار الخليج ستار للمحاسبة؟'}
+              {lang === 'en' ? 'Why Choose Almahy Legal Services Accounting?' : 'لماذا تختار الخليج ستار للمحاسبة؟'}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {pageContent.whyUs.map((item, index) => (
