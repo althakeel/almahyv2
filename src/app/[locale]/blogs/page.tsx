@@ -35,7 +35,7 @@ export default function BlogsPage() {
   }), [lang]);
 
   return (
-    <main className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'Montserrat, sans-serif' }}>
+    <main className="min-h-screen bg-white pt-24" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: 'Montserrat, sans-serif' }}>
 
       {/* ── Independent Blogs Page Banner ── */}
       {blogsPageBanner ? (
@@ -77,7 +77,7 @@ export default function BlogsPage() {
         </div>
       ) : (
         /* No posts — placeholder banner */
-        <div className="relative w-full bg-[#160A0A] flex items-center justify-center" style={{ minHeight: 340, marginTop: 72 }}>
+        <div className="relative w-full bg-[#160A0A] flex items-center justify-center" style={{ minHeight: 340 }}>
           <p className="text-white/40 text-lg font-semibold">{tx.noBlogs}</p>
         </div>
       )}

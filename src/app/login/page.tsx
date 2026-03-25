@@ -2,24 +2,19 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signOut,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { Locale } from '@/lib/translations';
 import { ensureDashboardAccessRequest, getPrimaryAdminEmail, normalizeEmail } from '@/lib/admin-access';
 
 export default function LoginPage() {
-  const params = useParams();
   const router = useRouter();
-  const locale = (((params?.locale as string) || 'en') === 'ar' ? 'ar' : 'en') as Locale;
-  const isArabic = locale === 'ar';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,68 +22,38 @@ export default function LoginPage() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const primaryAdminEmail = getPrimaryAdminEmail();
 
-  const content = {
-    en: {
-      title: 'Admin / Editor Login',
-      subtitle: 'Only the primary admin can open the dashboard immediately. Other users must be approved by admin first.',
-      email: 'Email Address',
-      password: 'Password',
-      forgot: 'Access is managed by admin invitation.',
-      login: 'Login',
-      register: 'Create Account',
-      google: 'Sign in with Google',
-      noAccount: 'Need access first?',
-      inviteNote: primaryAdminEmail
-        ? `Primary admin: ${primaryAdminEmail}`
-        : 'Set NEXT_PUBLIC_PRIMARY_ADMIN_EMAIL to define the primary admin.',
-      backHome: 'Back to Home',
-      denied: 'Your account is waiting for admin approval before dashboard access is granted.',
-      inviteOnly: 'Your account was created/sign-in completed, but admin approval is still required.',
-      invalid: 'Please enter a valid email address and password.',
-    },
-    ar: {
-      title: 'تسجيل دخول الإدارة / المحررين',
-      subtitle: 'يمكن فقط للبريد الإداري الرئيسي فتح اللوحة مباشرة. أما بقية المستخدمين فيحتاجون إلى موافقة المدير أولاً.',
-      email: 'البريد الإلكتروني',
-      password: 'كلمة المرور',
-      forgot: 'تتم إدارة الوصول من خلال دعوة إدارية.',
-      login: 'تسجيل الدخول',
-      register: 'إنشاء حساب',
-      google: 'تسجيل الدخول عبر Google',
-      noAccount: 'تحتاج إلى صلاحية أولاً؟',
-      inviteNote: primaryAdminEmail
-        ? `البريد الإداري الرئيسي: ${primaryAdminEmail}`
-        : 'قم بتعيين NEXT_PUBLIC_PRIMARY_ADMIN_EMAIL لتحديد البريد الإداري الرئيسي.',
-      backHome: 'العودة للرئيسية',
-      denied: 'حسابك بانتظار موافقة المدير قبل منحك صلاحية دخول لوحة المدونة.',
-      inviteOnly: 'تم إنشاء الحساب أو تسجيل الدخول، لكن ما زالت موافقة المدير مطلوبة.',
-      invalid: 'يرجى إدخال بريد إلكتروني صالح وكلمة مرور.',
-    },
-  } as const;
-
-  const t = content[isArabic ? 'ar' : 'en'];
+  const t = {
+    title: 'Admin / Editor Login',
+    subtitle: 'Only the primary admin can open the dashboard immediately. Other users must be approved by admin first.',
+    email: 'Email Address',
+    password: 'Password',
+    forgot: 'Access is managed by admin invitation.',
+    login: 'Login',
+    register: 'Create Account',
+    google: 'Sign in with Google',
+    noAccount: 'Need access first?',
+    inviteNote: primaryAdminEmail
+      ? `Primary admin: ${primaryAdminEmail}`
+      : 'Set NEXT_PUBLIC_PRIMARY_ADMIN_EMAIL to define the primary admin.',
+    backHome: 'Back to Home',
+    inviteOnly: 'Your account was created/sign-in completed, but admin approval is still required.',
+    invalid: 'Please enter a valid email address and password.',
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (authActionInProgress) {
-        return;
-      }
+      if (authActionInProgress) return;
 
-      if (!user?.email) {
-        return;
-      }
-
+      if (!user?.email) return;
       const access = await ensureDashboardAccessRequest(user.email);
       if (access?.status === 'active') {
-        router.push(`/${locale}/dashboard`);
-        return;
+        router.push('/en/dashboard');
+      } else {
+        router.push('/portal');
       }
-
-      router.push('/portal');
     });
-
     return () => unsubscribe();
-  }, [authActionInProgress, locale, router]);
+  }, [authActionInProgress, router]);
 
   const validateInputs = () => {
     const normalizedEmail = normalizeEmail(email);
@@ -97,15 +62,12 @@ export default function LoginPage() {
       setFeedback({ type: 'error', message: t.invalid });
       return null;
     }
-
     return normalizedEmail;
   };
 
   const runAuthAction = async (mode: 'login' | 'register') => {
     const normalizedEmail = validateInputs();
-    if (!normalizedEmail) {
-      return;
-    }
+    if (!normalizedEmail) return;
 
     try {
       setLoading(true);
@@ -121,22 +83,22 @@ export default function LoginPage() {
       const access = await ensureDashboardAccessRequest(normalizedEmail);
 
       if (access?.status === 'active') {
-        setFeedback({ type: 'success', message: isArabic ? 'تم تسجيل الدخول بنجاح.' : 'Logged in successfully.' });
-        router.push(`/${locale}/dashboard`);
+        setFeedback({ type: 'success', message: 'Logged in successfully.' });
+        router.push('/en/dashboard');
         return;
       }
 
       router.push('/portal');
-    } catch (error: any) {
-      const code = error?.code as string | undefined;
-      let message = isArabic ? 'حدث خطأ غير متوقع.' : 'Unexpected error occurred.';
+    } catch (error: unknown) {
+      const code = (error as { code?: string })?.code;
+      let message = 'Unexpected error occurred.';
 
       if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
-        message = isArabic ? 'بيانات الدخول غير صحيحة.' : 'Invalid login credentials.';
+        message = 'Invalid login credentials.';
       } else if (code === 'auth/email-already-in-use') {
-        message = isArabic ? 'البريد الإلكتروني مستخدم بالفعل.' : 'Email is already in use.';
+        message = 'Email is already in use.';
       } else if (code === 'auth/weak-password') {
-        message = isArabic ? 'كلمة المرور ضعيفة. استخدم 6 أحرف على الأقل.' : 'Weak password. Use at least 6 characters.';
+        message = 'Weak password. Use at least 6 characters.';
       }
 
       setFeedback({ type: 'error', message });
@@ -157,17 +119,13 @@ export default function LoginPage() {
       const access = signedInEmail ? await ensureDashboardAccessRequest(signedInEmail) : null;
 
       if (access?.status === 'active') {
-        router.push(`/${locale}/dashboard`);
+        router.push('/en/dashboard');
         return;
       }
 
       router.push('/portal');
     } catch {
-      setFeedback({
-        type: 'error',
-        message: isArabic ? 'فشل تسجيل الدخول عبر Google.' : 'Google sign-in failed.',
-
-      });
+      setFeedback({ type: 'error', message: 'Google sign-in failed.' });
     } finally {
       setAuthActionInProgress(false);
       setLoading(false);
@@ -175,11 +133,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-24">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-amber-200/20 bg-white/[0.03] p-7 md:p-8 shadow-2xl backdrop-blur-sm" dir={isArabic ? 'rtl' : 'ltr'}>
+    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-24 flex items-center justify-center">
+      <div className="mx-auto w-full max-w-md rounded-2xl border border-amber-200/20 bg-white/[0.03] p-7 md:p-8 shadow-2xl backdrop-blur-sm">
         <h1 className="mb-3 text-center text-3xl font-bold text-white">{t.title}</h1>
         <p className="mb-4 text-center text-sm text-slate-300 md:text-base">{t.subtitle}</p>
-        <p className="mb-8 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-slate-300">{t.inviteNote}</p>
+        <p className="mb-8 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-slate-300">
+          {t.inviteNote}
+        </p>
 
         <form
           className="space-y-5"
@@ -250,7 +210,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-7 text-center">
-          <Link href={`/${locale}`} className="text-sm text-slate-300 transition-colors hover:text-white">
+          <Link href="/" className="text-sm text-slate-300 transition-colors hover:text-white">
             {t.backHome}
           </Link>
         </div>

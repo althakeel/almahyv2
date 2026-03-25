@@ -93,14 +93,29 @@ export async function POST(request: Request) {
             </div>
           `;
 
-    await resend.emails.send({
+    const sendResult = await resend.emails.send({
       from: resendFromEmail,
       to: email,
       subject,
       html,
     });
 
-    return NextResponse.json({ success: true });
+    if (sendResult.error) {
+      const apiMessage =
+        typeof sendResult.error === 'object' && sendResult.error !== null && 'message' in sendResult.error
+          ? String((sendResult.error as { message?: string }).message || 'Failed to send invitation email.')
+          : 'Failed to send invitation email.';
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: apiMessage,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, id: sendResult.data?.id || null });
   } catch (error) {
     console.error('Resend invitation email error:', error);
     const message = error instanceof Error ? error.message : 'Failed to send invitation email.';

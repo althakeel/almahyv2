@@ -78,7 +78,6 @@ export default function Dashboard() {
     calls: false,
   });
   const primaryAdminEmail = getPrimaryAdminEmail();
-  const isAdmin = accessRole === 'admin';
 
   const loadAccessUsers = async () => {
     try {
@@ -620,17 +619,6 @@ export default function Dashboard() {
               {locale === 'ar' ? 'إدارة المدونة' : 'Blogs'}
             </button>
           ) : null}
-          {isAdmin ? (
-            <button
-              type="button"
-              onClick={() => setActiveSection('access')}
-              className={`w-full rounded-xl px-4 py-3 font-semibold text-left transition-colors ${
-                activeSection === 'access' ? 'bg-[#DE3B34] text-white' : 'text-white/80 hover:bg-white/10'
-              }`}
-            >
-              {locale === 'ar' ? 'صلاحيات الوصول' : 'Access Control'}
-            </button>
-          ) : null}
           {allowedSections.transactions ? (
             <div className="rounded-xl px-4 py-3 text-white/80 pointer-events-none">
               {locale === 'ar' ? 'المعاملات' : 'Transactions'}
@@ -659,7 +647,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className={`md:hidden mb-4 grid gap-2 ${isAdmin ? 'grid-cols-3' : allowedSections.blogs ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <div className={`md:hidden mb-4 grid gap-2 ${allowedSections.blogs ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <button
             type="button"
             onClick={() => setActiveSection('dashboard')}
@@ -678,17 +666,6 @@ export default function Dashboard() {
               }`}
             >
               {locale === 'ar' ? 'المدونة' : 'Blogs'}
-            </button>
-          ) : null}
-          {isAdmin ? (
-            <button
-              type="button"
-              onClick={() => setActiveSection('access')}
-              className={`rounded-xl px-4 py-2.5 font-semibold transition-colors ${
-                activeSection === 'access' ? 'bg-[#DE3B34] text-white' : 'bg-white text-[#160A0A]'
-              }`}
-            >
-              {locale === 'ar' ? 'الصلاحيات' : 'Access'}
             </button>
           ) : null}
         </div>

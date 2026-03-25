@@ -37,7 +37,7 @@ export default function BlogDetailsPage() {
   const content = lang === 'ar' ? blog?.contentAr || blog?.content || '' : blog?.content || '';
 
   return (
-    <main className="min-h-screen bg-white" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <main className="min-h-screen bg-white pt-24" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
 
       {/* ── Full-width Hero ── */}
       <div className="relative w-full h-[35vh] md:h-[45vh] overflow-hidden bg-[#160A0A]">
