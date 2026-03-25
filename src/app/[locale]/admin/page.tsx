@@ -45,6 +45,19 @@ export default function AdminPage() {
     }
   };
 
+  const upsertUser = (nextUser: DashboardAccessRecord) => {
+    setUsers((prev) => {
+      const index = prev.findIndex((item) => normalizeEmail(item.email) === normalizeEmail(nextUser.email));
+      if (index === -1) {
+        return [nextUser, ...prev];
+      }
+
+      const clone = [...prev];
+      clone[index] = nextUser;
+      return clone;
+    });
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
@@ -87,11 +100,14 @@ export default function AdminPage() {
     setActionLoading(true);
     setFeedback(null);
     try {
-      await approveDashboardAccess(
+      const approvedUser = await approveDashboardAccess(
         emailToApprove,
         adminEmail,
         permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
       );
+      if (approvedUser) {
+        upsertUser(approvedUser);
+      }
       const res = await fetch('/api/invitations/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,6 +133,7 @@ export default function AdminPage() {
     setFeedback(null);
     try {
       await revokeDashboardAccess(email);
+      setUsers((prev) => prev.filter((item) => normalizeEmail(item.email) !== normalizeEmail(email)));
       setFeedback({ type: 'success', message: `Access revoked for ${email}` });
       await loadUsers();
     } catch {
@@ -135,11 +152,14 @@ export default function AdminPage() {
     setActionLoading(true);
     setFeedback(null);
     try {
-      await approveDashboardAccess(
+      const approvedUser = await approveDashboardAccess(
         email,
         adminEmail,
         permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
       );
+      if (approvedUser) {
+        upsertUser(approvedUser);
+      }
       const res = await fetch('/api/invitations/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
