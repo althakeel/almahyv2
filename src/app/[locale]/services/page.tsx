@@ -154,7 +154,7 @@ export default async function ServicesPage({
             {t.servicesCTADesc}
           </p>
           <Link 
-            href="https://wa.me/97142648831?text=Hello%2C%20I%20would%20like%20to%20know%20more%20about%20your%20services"
+            href="https://wa.me/0542185535?text=Hello%2C%20I%20would%20like%20to%20know%20more%20about%20your%20services"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-amber-300 hover:bg-amber-200 text-slate-900 font-bold px-8 py-4 rounded-full text-lg transition-colors shadow-lg border-2 border-amber-300"

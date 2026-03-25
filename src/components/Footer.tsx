@@ -34,6 +34,7 @@ const contactLinks = [
       </svg>
     ),
   },
+  
 ];
 
 export default function Footer({ locale }: { locale: string }) {

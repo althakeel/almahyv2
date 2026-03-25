@@ -361,7 +361,7 @@ export default async function Page({
       </ul>
       {/* Button */}
       <Link
-        href={`https://wa.me/97142648831?text=Hello, I would like to know more about the ${name}`}
+        href={`https://wa.me/0542185535?text=Hello, I would like to know more about the ${name}`}
         target="_blank"
         rel="noopener noreferrer"
         className="block w-full text-center py-3 rounded-md font-semibold text-sm uppercase tracking-wide transition-all"
@@ -482,7 +482,7 @@ export default async function Page({
               : 'اتصل بنا للحصول على حل مصمم خصيصاً ليناسب احتياجات عملك الفريدة.'}
           </p>
           <Link
-            href={`https://wa.me/97142648831?text=Hello, I need a custom pricing plan`}
+            href={`https://wa.me/0542185535?text=Hello, I need a custom pricing plan`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block text-gray-900 font-bold px-10 py-4 rounded-full transition-colors shadow-xl border-2"

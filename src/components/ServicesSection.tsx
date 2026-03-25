@@ -10,7 +10,7 @@ interface ServicesSectionProps {
 
 const servicesData = {
   en: {
-    title: 'Almahy Legal Service',
+    title: 'Almahy Legal Services',
     services: [
       {
         title: 'LEGAL SERVICES',

@@ -97,7 +97,7 @@ export default function CTA({ locale = "en" }: CTAProps) {
 
               {/* BUTTON */}
               <Link
-                href="https://wa.me/97142648831?text=Hello%2C%20I%20would%20like%20to%20get%20accounting%20services"
+                href="https://wa.me/0542185535?text=Hello%2C%20I%20would%20like%20to%20get%20accounting%20services"
                 target="_blank"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#DE3B34] rounded-lg font-semibold hover:bg-[#FFB6B6] transition"
               >
