@@ -317,7 +317,7 @@ export default function Navbar({ locale }: NavbarProps) {
             <button
               type="button"
               onClick={() => currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true)}
-              className="font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl"
+              className={`font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl ${currentUser ? '' : 'hidden'}`}
               style={{
                 backgroundColor: '#231111',
                 color: '#F0D4D2',
@@ -347,17 +347,8 @@ export default function Navbar({ locale }: NavbarProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 1115 0" />
                 </svg>
               )}
-              {currentUser ? (
-                <>
-                  <span className="hidden xs:inline md:inline">{lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`}</span>
-                  <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Portal' : 'بوابة'}</span>
-                </>
-              ) : (
-                <>
-                  <span className="hidden xs:inline md:inline">{lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب'}</span>
-                  <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Login' : 'دخول'}</span>
-                </>
-              )}
+              <span className="hidden xs:inline md:inline">{lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`}</span>
+              <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Portal' : 'بوابة'}</span>
             </button>
 
             {/* Mobile Menu Button */}
