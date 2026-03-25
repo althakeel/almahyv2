@@ -34,6 +34,15 @@ const contactLinks = [
       </svg>
     ),
   },
+  {
+    label: "+971 5421 85535",
+    href: "tel:+971542185535",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M6.5 3h3l1 4-2 .8a10 10 0 0 0 4.2 4.2l.8-2 4 1v3a2 2 0 0 1-2.3 2 16 16 0 0 1-7.7-3.6 16 16 0 0 1-3.6-7.7A2 2 0 0 1 6.5 3Z" />
+      </svg>
+    ),
+  },
   
 ];
 

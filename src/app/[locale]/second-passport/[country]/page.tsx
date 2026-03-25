@@ -1014,10 +1014,10 @@ export default async function SecondPassportCountryPage({
   const antiguaNews = isAntigua ? await fetchAntiguaNews() : [];
   const stKittsNews = isStKitts ? await fetchStKittsNews() : [];
   const premiumNews = isAntigua ? antiguaNews : isStKitts ? stKittsNews : [];
-  const whatsappHelpUrl = `https://wa.me/0542185535?text=${encodeURIComponent(
+  const whatsappHelpUrl = `https://wa.me/971542185535?text=${encodeURIComponent(
     `Hello, I want help with ${content.title}`
   )}`;
-  const whatsappStartUrl = `https://wa.me/0542185535?text=${encodeURIComponent(
+  const whatsappStartUrl = `https://wa.me/971542185535?text=${encodeURIComponent(
     `Hello, I want to start my ${content.title} citizenship application`
   )}`;
   const pageBgClass = isTurkiye

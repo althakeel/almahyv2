@@ -488,7 +488,7 @@ export default async function SecondPassportPage({
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <a
-              href="https://wa.me/0542185535?text=Hello%2C%20I%20want%20help%20with%20a%20second%20passport%20program"
+              href="https://wa.me/971542185535?text=Hello%2C%20I%20want%20help%20with%20a%20second%20passport%20program"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-full font-bold px-6 py-3 transition-colors"

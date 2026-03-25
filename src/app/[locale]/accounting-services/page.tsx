@@ -118,7 +118,7 @@ export default async function AccountingServicesPage({
               {pageContent.heroSubtitle}
             </p>
             <a
-              href="https://wa.me/0542185535?text=Hello%2C%20I%20would%20like%20to%20schedule%20a%20consultation"
+              href="https://wa.me/971542185535?text=Hello%2C%20I%20would%20like%20to%20schedule%20a%20consultation"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-2xl"
@@ -217,7 +217,7 @@ export default async function AccountingServicesPage({
             </p>
             
             <a
-              href="https://wa.me/0542185535?text=Hello%2C%20I%20would%20like%20to%20get%20a%20quote%20for%20accounting%20services"
+              href="https://wa.me/971542185535?text=Hello%2C%20I%20would%20like%20to%20get%20a%20quote%20for%20accounting%20services"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-12 py-4 rounded-md transition-colors shadow-xl uppercase tracking-widest text-sm"

@@ -37,7 +37,7 @@ export default function RootLayout({
       >
         {children}
         <a
-          href="https://wa.me/0542185535"
+          href="https://wa.me/971542185535"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"

@@ -87,7 +87,7 @@ export default async function AboutPage({
               📅 {lang === 'en' ? 'Book Free Consultation' : 'احجز استشارة مجانية'}
             </Link>
             <a 
-              href="tel:+97142648831"
+              href="tel:+971542185535"
               className="bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white font-bold px-8 py-3 rounded-full transition-all flex items-center gap-2"
             >
               📞 {lang === 'en' ? 'Call Us' : 'اتصل بنا'}
