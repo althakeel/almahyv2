@@ -289,50 +289,28 @@ export default function Navbar({ locale }: NavbarProps) {
 
           {/* Right: Button and Language Switcher */}
           <div className={`flex items-center gap-2 md:gap-4 ${lang === 'ar' ? 'order-3' : 'order-3'}`}>
-            <div className="hidden md:flex items-center rounded-full border border-white/20 bg-white/10 p-1 backdrop-blur">
+            <div className="hidden md:flex items-center rounded-full border border-[#6C2B27] bg-[#170C0C]/95 p-1 backdrop-blur">
               <button
                 onClick={() => switchLanguage('en')}
-                className={`relative overflow-hidden px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
                   lang === 'en'
-                    ? 'text-gray-900 shadow-lg'
-                    : 'text-white hover:bg-white/10'
+                    ? 'bg-[#4A1C1A] text-[#F2D6D4] shadow-[0_4px_12px_rgba(0,0,0,0.28)]'
+                    : 'text-[#B98B89] hover:bg-[#241212] hover:text-[#DFC1BF]'
                 }`}
-                style={
-                  lang === 'en'
-                    ? {
-                        background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
-                        boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -2px 0 rgba(120,78,0,0.35), 0 2px 8px rgba(0,0,0,0.35)',
-                      }
-                    : undefined
-                }
                 aria-label="Switch to English"
               >
-                {lang === 'en' ? (
-                  <span className="pointer-events-none absolute left-[8%] top-[2px] h-[45%] w-[84%] rounded-full bg-white/35 blur-[1px]" />
-                ) : null}
-                <span className="relative z-10">EN</span>
+                EN
               </button>
               <button
                 onClick={() => switchLanguage('ar')}
-                className={`relative overflow-hidden px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
                   lang === 'ar'
-                    ? 'text-gray-900 shadow-lg'
-                    : 'text-white hover:bg-white/10'
+                    ? 'bg-[#4A1C1A] text-[#F2D6D4] shadow-[0_4px_12px_rgba(0,0,0,0.28)]'
+                    : 'text-[#B98B89] hover:bg-[#241212] hover:text-[#DFC1BF]'
                 }`}
-                style={
-                  lang === 'ar'
-                    ? {
-                        background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
-                        boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -2px 0 rgba(120,78,0,0.35), 0 2px 8px rgba(0,0,0,0.35)',
-                      }
-                    : undefined
-                }
                 aria-label="Switch to Arabic"
               >
-                {lang === 'ar' ? (
-                  <span className="pointer-events-none absolute left-[8%] top-[2px] h-[45%] w-[84%] rounded-full bg-white/35 blur-[1px]" />
-                ) : null}
-                <span className="relative z-10">AR</span>
+                AR
               </button>
             </div>
 
@@ -341,17 +319,20 @@ export default function Navbar({ locale }: NavbarProps) {
               onClick={() => currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true)}
               className="font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl"
               style={{
-                backgroundColor: '#000000',
-                color: '#ffffff',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                backgroundColor: '#231111',
+                color: '#F0D4D2',
+                border: '1px solid #7A302C',
+                boxShadow: '0 6px 16px rgba(0,0,0,0.35)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#1a1a1a'
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)'
+                e.currentTarget.style.backgroundColor = '#2A1414'
+                e.currentTarget.style.borderColor = '#A5443E'
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.45)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#000000'
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)'
+                e.currentTarget.style.backgroundColor = '#231111'
+                e.currentTarget.style.borderColor = '#7A302C'
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.35)'
               }}
             >
               {currentUser?.photoURL ? (
@@ -362,7 +343,9 @@ export default function Navbar({ locale }: NavbarProps) {
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <span>👤</span>
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 1115 0" />
+                </svg>
               )}
               {currentUser ? (
                 <>
@@ -464,48 +447,26 @@ export default function Navbar({ locale }: NavbarProps) {
                     switchLanguage('en');
                     setMobileMenuOpen(false);
                   }}
-                  className={`relative overflow-hidden flex-1 px-2 py-2 text-xs font-semibold rounded transition-all ${
+                  className={`flex-1 px-2 py-2 text-xs font-semibold rounded transition-all ${
                     lang === 'en'
-                      ? 'text-gray-900 shadow-md'
-                      : 'bg-gray-700 text-white hover:bg-gray-600'
+                      ? 'bg-[#4A1C1A] text-[#F2D6D4]'
+                      : 'bg-[#2A1515] text-[#B98B89] hover:bg-[#341A1A]'
                   }`}
-                  style={
-                    lang === 'en'
-                      ? {
-                          background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
-                          boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.5), inset 0 -2px 0 rgba(120,78,0,0.35)',
-                        }
-                      : undefined
-                  }
                 >
-                  {lang === 'en' ? (
-                    <span className="pointer-events-none absolute left-[8%] top-[2px] h-[45%] w-[84%] rounded-full bg-white/30 blur-[1px]" />
-                  ) : null}
-                  <span className="relative z-10">EN</span>
+                  EN
                 </button>
                 <button
                   onClick={() => {
                     switchLanguage('ar');
                     setMobileMenuOpen(false);
                   }}
-                  className={`relative overflow-hidden flex-1 px-2 py-2 text-xs font-semibold rounded transition-all ${
+                  className={`flex-1 px-2 py-2 text-xs font-semibold rounded transition-all ${
                     lang === 'ar'
-                      ? 'text-gray-900 shadow-md'
-                      : 'bg-gray-700 text-white hover:bg-gray-600'
+                      ? 'bg-[#4A1C1A] text-[#F2D6D4]'
+                      : 'bg-[#2A1515] text-[#B98B89] hover:bg-[#341A1A]'
                   }`}
-                  style={
-                    lang === 'ar'
-                      ? {
-                          background: 'linear-gradient(180deg, #FFB6B6 0%, #DE3B34 56%, #CECDCB 100%)',
-                          boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.5), inset 0 -2px 0 rgba(120,78,0,0.35)',
-                        }
-                      : undefined
-                  }
                 >
-                  {lang === 'ar' ? (
-                    <span className="pointer-events-none absolute left-[8%] top-[2px] h-[45%] w-[84%] rounded-full bg-white/30 blur-[1px]" />
-                  ) : null}
-                  <span className="relative z-10">AR</span>
+                  AR
                 </button>
               </div>
               <button
@@ -514,9 +475,10 @@ export default function Navbar({ locale }: NavbarProps) {
                   setMobileMenuOpen(false);
                   currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true);
                 }}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-bold text-white transition-all duration-200 shadow-[0_8px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.4)]"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-bold text-[#F0D4D2] transition-all duration-200 shadow-[0_8px_20px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
                 style={{
-                  backgroundColor: '#000000'
+                  backgroundColor: '#231111',
+                  border: '1px solid #7A302C'
                 }}
               >
                 {currentUser?.photoURL ? (
@@ -527,7 +489,9 @@ export default function Navbar({ locale }: NavbarProps) {
                     referrerPolicy="no-referrer"
                   />
                 ) : currentUser ? (
-                  <span>👤</span>
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 1115 0" />
+                  </svg>
                 ) : null}
                 {currentUser ? (lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`) : (lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب')}
               </button>

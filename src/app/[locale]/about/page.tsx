@@ -32,7 +32,7 @@ export default async function AboutPage({
       photo: "/assets/employs/Dalia%20Ghonem%20copy.webp",
     },
     {
-      name: "Fadeel",
+      name: "Maged Nafea",
       position: lang === "en" ? "Legal Team" : "الفريق القانوني",
       photo: "/assets/employs/Fadeel%20copy.webp",
     },
