@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import favicon from "./Favicon.png";
+import FloatingWhatsappButtons from "@/components/FloatingWhatsappButtons";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,22 +36,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
-        <a
-          href="https://wa.me/971542185535"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Chat on WhatsApp"
-          className="fixed bottom-16 right-4 md:bottom-12 md:right-5 z-50 transition-transform hover:scale-105"
-        >
-          <Image
-            src="/assets/whatsapp.png"
-            alt="WhatsApp"
-            width={48}
-            height={48}
-            className="w-12 h-12 md:w-[56px] md:h-[56px]"
-            priority
-          />
-        </a>
+        <FloatingWhatsappButtons />
       </body>
     </html>
   );

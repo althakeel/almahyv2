@@ -6,7 +6,8 @@ import { useParams } from 'next/navigation';
 import { Locale } from '@/lib/translations';
 import {
   BlogPost,
-  loadBlogsPageBannerConfigFromCloud,
+  loadBlogsFromServer,
+  loadBlogsPageBannerConfigFromServer,
   readBlogsFromStorage,
   readBlogsPageBannerCardFromStorage,
   readBlogsPageBannerFromStorage,
@@ -17,29 +18,32 @@ export default function BlogsPage() {
   const locale = (params?.locale as string) || 'en';
   const lang: Locale = locale === 'ar' ? 'ar' : 'en';
   const isRTL = lang === 'ar';
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
-  const [blogsPageBanner, setBlogsPageBanner] = useState('');
-  const [bannerCardTitle, setBannerCardTitle] = useState('');
-  const [bannerCardSub, setBannerCardSub] = useState('');
+  const [blogs, setBlogs] = useState<BlogPost[]>(() => readBlogsFromStorage());
+  const [blogsPageBanner, setBlogsPageBanner] = useState(() => readBlogsPageBannerFromStorage());
+  const [bannerCardTitle, setBannerCardTitle] = useState(() => {
+    const localCard = readBlogsPageBannerCardFromStorage();
+    return lang === 'ar' ? localCard.titleAr : localCard.titleEn;
+  });
+  const [bannerCardSub, setBannerCardSub] = useState(() => {
+    const localCard = readBlogsPageBannerCardFromStorage();
+    return lang === 'ar' ? localCard.subAr : localCard.subEn;
+  });
   const fallbackBanner = '/assets/banner/DB1.webp';
 
   useEffect(() => {
-    setBlogs(readBlogsFromStorage());
+    const loadServerData = async () => {
+      const [serverBlogs, bannerConfig] = await Promise.all([
+        loadBlogsFromServer(),
+        loadBlogsPageBannerConfigFromServer(),
+      ]);
 
-    const localBanner = readBlogsPageBannerFromStorage();
-    const localCard = readBlogsPageBannerCardFromStorage();
-    setBlogsPageBanner(localBanner);
-    setBannerCardTitle(lang === 'ar' ? localCard.titleAr : localCard.titleEn);
-    setBannerCardSub(lang === 'ar' ? localCard.subAr : localCard.subEn);
-
-    const loadCloudBannerConfig = async () => {
-      const cloudConfig = await loadBlogsPageBannerConfigFromCloud();
-      setBlogsPageBanner(cloudConfig.bannerUrl);
-      setBannerCardTitle(lang === 'ar' ? cloudConfig.card.titleAr : cloudConfig.card.titleEn);
-      setBannerCardSub(lang === 'ar' ? cloudConfig.card.subAr : cloudConfig.card.subEn);
+      setBlogs(serverBlogs);
+      setBlogsPageBanner(bannerConfig.bannerUrl);
+      setBannerCardTitle(lang === 'ar' ? bannerConfig.card.titleAr : bannerConfig.card.titleEn);
+      setBannerCardSub(lang === 'ar' ? bannerConfig.card.subAr : bannerConfig.card.subEn);
     };
 
-    void loadCloudBannerConfig();
+    void loadServerData();
   }, [lang]);
 
   const tx = useMemo(() => ({

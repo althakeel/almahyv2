@@ -81,7 +81,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const desktopHeroImage = "/assets/banner/DB1.webp";
+  const desktopHeroImage = isRTL ? "/assets/banner/DB1B.webp" : "/assets/banner/DB1.webp";
   const mobileHeroImage = "/assets/banner/MB1.webp";
 
   /* ---------------- Component ---------------- */

@@ -8,6 +8,7 @@ const palette = {
   accent: "#CECDCB",
   muted: "#CECDCB",
   dark: "#160A0A",
+  white: "#FFFFFF",
 };
 
 const countries = [
@@ -449,7 +450,7 @@ export default async function SecondPassportPage({
     <div
       dir={isArabic ? "rtl" : "ltr"}
       className={`min-h-screen ${isArabic ? "text-right" : "text-left"}`}
-      style={{ backgroundColor: palette.dark, color: palette.primary }}
+      style={{ backgroundColor: palette.dark, color: palette.secondary }}
     >
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
@@ -492,7 +493,7 @@ export default async function SecondPassportPage({
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-full font-bold px-6 py-3 transition-colors"
-              style={{ backgroundColor: palette.primary, color: palette.dark }}
+              style={{ backgroundColor: palette.primary, color: palette.white }}
             >
               {isArabic ? "تحدث مع خبير" : "Speak with an Expert"}
             </a>
@@ -504,7 +505,7 @@ export default async function SecondPassportPage({
       <section className="max-w-[1250px] mx-auto px-4 md:px-8 pb-14">
         <h2
           className="text-2xl md:text-3xl font-bold mb-6"
-          style={{ color: palette.secondary, opacity: 0, animation: "fadeIn 0.45s ease-out forwards" }}
+          style={{ color: palette.white, opacity: 0, animation: "fadeIn 0.45s ease-out forwards" }}
         >
           {isArabic ? "الدول المتاحة" : "Available Countries"}
         </h2>
@@ -536,7 +537,7 @@ export default async function SecondPassportPage({
               />
 
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <h3 className="text-2xl font-bold mb-2" style={{ color: palette.primary }}>
+                <h3 className="text-2xl font-bold mb-2" style={{ color: palette.white }}>
                   {country.name}
                 </h3>
                 <p className="text-sm mb-4 leading-relaxed" style={{ color: palette.muted }}>
@@ -549,7 +550,7 @@ export default async function SecondPassportPage({
                     borderColor: `${palette.accent}55`,
                     borderWidth: "0.1px",
                     borderRadius: "5px",
-                    color: palette.primary,
+                    color: palette.white,
                   }}
                 >
                   {isArabic ? "عرض التفاصيل" : "View details"}
@@ -589,11 +590,11 @@ export default async function SecondPassportPage({
           <div className="relative z-10 text-center mb-10">
             <span
               className="inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] mb-4"
-              style={{ color: palette.primary, backgroundColor: `${palette.primary}1A`, border: `1px solid ${palette.accent}66` }}
+              style={{ color: palette.secondary, backgroundColor: `${palette.primary}1A`, border: `1px solid ${palette.accent}66` }}
             >
               {isArabic ? "فوائد أساسية" : "Core Benefits"}
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold max-w-3xl leading-tight mx-auto" style={{ color: palette.secondary }}>
+            <h2 className="text-3xl md:text-5xl font-bold max-w-3xl leading-tight mx-auto" style={{ color: palette.white }}>
               {isArabic ? "لماذا تستثمر في جنسية ثانية؟" : "Why Should You Invest in a Second Citizenship?"}
             </h2>
           </div>
@@ -607,11 +608,11 @@ export default async function SecondPassportPage({
               >
                 <div
                   className="mb-4 w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ color: palette.primary, backgroundColor: `${palette.primary}24`, border: `1px solid ${palette.accent}66` }}
+                  style={{ color: palette.secondary, backgroundColor: `${palette.primary}24`, border: `1px solid ${palette.accent}66` }}
                 >
                   <BenefitIcon type={item.icon} />
                 </div>
-                <h3 className="text-[34px] font-bold mb-2 leading-tight" style={{ color: palette.primary }}>{item.title}</h3>
+                <h3 className="text-[34px] font-bold mb-2 leading-tight" style={{ color: palette.white }}>{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: palette.muted }}>
                   {item.desc}
                 </p>
@@ -622,7 +623,7 @@ export default async function SecondPassportPage({
       </section>
 
       <section className="max-w-[1250px] mx-auto px-4 md:px-8 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: palette.secondary }}>
+        <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: palette.white }}>
           {isArabic ? "الخطوات" : "Simple Steps"}
         </h2>
         <p className="mb-6 text-sm md:text-base" style={{ color: palette.muted }}>
@@ -648,7 +649,7 @@ export default async function SecondPassportPage({
               >
                 {(index + 1).toString().padStart(2, "0")}
               </div>
-              <div className="text-xl md:text-2xl font-bold" style={{ color: palette.secondary }}>
+              <div className="text-xl md:text-2xl font-bold" style={{ color: palette.white }}>
                 {step}
               </div>
             </div>
@@ -657,7 +658,7 @@ export default async function SecondPassportPage({
       </section>
 
       <section className="max-w-[1250px] mx-auto px-4 md:px-8 pb-14">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: palette.secondary }}>
+        <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: palette.white }}>
           {isArabic ? "لماذا هذا المسار؟" : "Why this route?"}
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -667,7 +668,7 @@ export default async function SecondPassportPage({
               className="rounded-xl border p-5"
               style={{ borderColor: palette.muted, backgroundColor: `${palette.muted}22` }}
             >
-              <h3 className="text-lg font-bold mb-2" style={{ color: palette.primary }}>{item.title}</h3>
+              <h3 className="text-lg font-bold mb-2" style={{ color: palette.white }}>{item.title}</h3>
               <p style={{ color: palette.muted }}>{item.desc}</p>
             </div>
           ))}
@@ -675,7 +676,7 @@ export default async function SecondPassportPage({
       </section>
 
       <section className="max-w-[1250px] mx-auto px-4 md:px-8 pb-24">
-        <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: palette.secondary }}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: palette.white }}>
           FAQ
         </h2>
         <p className="mb-8 max-w-4xl text-sm leading-relaxed" style={{ color: palette.muted }}>
@@ -692,7 +693,7 @@ export default async function SecondPassportPage({
               style={{ borderColor: `${palette.muted}44` }}
             >
               <summary className="list-none cursor-pointer px-2 md:px-3 py-4 flex items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                <span className="font-semibold" style={{ color: palette.primary }}>{item.q}</span>
+                <span className="font-semibold" style={{ color: palette.white }}>{item.q}</span>
                 <span className="text-xl font-bold transition-transform group-open:rotate-45" style={{ color: palette.accent }}>
                   +
                 </span>
@@ -710,11 +711,11 @@ export default async function SecondPassportPage({
           <div>
             <span
               className="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] mb-3"
-              style={{ color: palette.primary, backgroundColor: `${palette.primary}14`, border: `1px solid ${palette.accent}66` }}
+              style={{ color: palette.secondary, backgroundColor: `${palette.primary}14`, border: `1px solid ${palette.accent}66` }}
             >
               {isArabic ? "المستجدات" : "Latest"}
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold" style={{ color: palette.secondary }}>
+            <h2 className="text-3xl md:text-5xl font-bold" style={{ color: palette.white }}>
               {isArabic ? "الأخبار والتحديثات" : "News & Updates."}
             </h2>
           </div>
@@ -752,18 +753,18 @@ export default async function SecondPassportPage({
                 )}
                 <span
                   className="absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider"
-                  style={{ backgroundColor: `${palette.dark}CC`, color: palette.primary, border: `1px solid ${palette.accent}66` }}
+                  style={{ backgroundColor: `${palette.dark}CC`, color: palette.secondary, border: `1px solid ${palette.accent}66` }}
                 >
                   {isArabic ? "خبر" : "News"}
                 </span>
               </div>
               <div className="p-4 md:p-5 min-h-[145px] flex flex-col justify-between">
                 {item.url ? (
-                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: palette.primary }}>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: palette.white }}>
                     <h3 className="text-2xl font-semibold leading-tight line-clamp-4">{item.title}</h3>
                   </a>
                 ) : (
-                  <h3 className="text-2xl font-semibold leading-tight line-clamp-4" style={{ color: palette.primary }}>
+                  <h3 className="text-2xl font-semibold leading-tight line-clamp-4" style={{ color: palette.white }}>
                     {item.title}
                   </h3>
                 )}

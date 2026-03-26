@@ -23,14 +23,16 @@ import {
 import {
   BlogPost,
   BlogsBannerCard,
-  loadBlogsPageBannerConfigFromCloud,
+  deleteBlogFromServer,
+  loadBlogsFromServer,
+  loadBlogsPageBannerConfigFromServer,
   readBlogsFromStorage,
   readBlogsPageBannerCardFromStorage,
   readBlogsPageBannerFromStorage,
-  saveBlogsPageBannerConfigToCloud,
+  saveBlogToServer,
+  saveBlogsPageBannerConfigToServer,
   slugify,
   writeBlogsPageBannerCardToStorage,
-  writeBlogsToStorage,
 } from '@/lib/blogs';
 
 export default function Dashboard() {
@@ -163,16 +165,21 @@ export default function Dashboard() {
     setBannerCardSubEn(localCard.subEn);
     setBannerCardSubAr(localCard.subAr);
 
-    const loadCloudBannerConfig = async () => {
-      const cloudConfig = await loadBlogsPageBannerConfigFromCloud();
-      setBlogsPageBanner(cloudConfig.bannerUrl);
-      setBannerCardTitleEn(cloudConfig.card.titleEn);
-      setBannerCardTitleAr(cloudConfig.card.titleAr);
-      setBannerCardSubEn(cloudConfig.card.subEn);
-      setBannerCardSubAr(cloudConfig.card.subAr);
+    const loadServerContent = async () => {
+      const [serverBlogs, bannerConfig] = await Promise.all([
+        loadBlogsFromServer(),
+        loadBlogsPageBannerConfigFromServer(),
+      ]);
+
+      setBlogs(serverBlogs);
+      setBlogsPageBanner(bannerConfig.bannerUrl);
+      setBannerCardTitleEn(bannerConfig.card.titleEn);
+      setBannerCardTitleAr(bannerConfig.card.titleAr);
+      setBannerCardSubEn(bannerConfig.card.subEn);
+      setBannerCardSubAr(bannerConfig.card.subAr);
     };
 
-    void loadCloudBannerConfig();
+    void loadServerContent();
   }, []);
 
   useEffect(() => {
@@ -436,7 +443,7 @@ export default function Dashboard() {
         subEn: bannerCardSubEn.trim(),
         subAr: bannerCardSubAr.trim(),
       };
-      await saveBlogsPageBannerConfigToCloud({
+      await saveBlogsPageBannerConfigToServer({
         bannerUrl: result.url,
         card,
         updatedBy: user?.email || undefined,
@@ -473,22 +480,30 @@ export default function Dashboard() {
     setBlogFeedback(null);
   };
 
-  const handleDeleteBlog = (blogId: string) => {
-    const nextBlogs = blogs.filter((blog) => blog.id !== blogId);
-    writeBlogsToStorage(nextBlogs);
-    setBlogs(nextBlogs);
+  const handleDeleteBlog = async (blogId: string) => {
+    try {
+      await deleteBlogFromServer(blogId);
+      const nextBlogs = blogs.filter((blog) => blog.id !== blogId);
+      setBlogs(nextBlogs);
 
-    if (editingBlogId === blogId) {
-      resetBlogForm();
+      if (editingBlogId === blogId) {
+        resetBlogForm();
+      }
+
+      setBlogFeedback({
+        type: 'success',
+        message: locale === 'ar' ? 'تم حذف المقالة.' : 'Blog deleted successfully.',
+      });
+    } catch (error) {
+      console.error('Delete blog error:', error);
+      setBlogFeedback({
+        type: 'error',
+        message: locale === 'ar' ? 'تعذر حذف المقالة.' : 'Failed to delete blog.',
+      });
     }
-
-    setBlogFeedback({
-      type: 'success',
-      message: locale === 'ar' ? 'تم حذف المقالة.' : 'Blog deleted successfully.',
-    });
   };
 
-  const handleCreateBlog = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateBlog = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setBlogFeedback(null);
 
@@ -503,66 +518,78 @@ export default function Dashboard() {
       return;
     }
 
-    if (editingBlogId) {
-      const nextBlogs = blogs.map((blog) =>
-        blog.id === editingBlogId
-          ? {
-              ...blog,
-              title: blogTitle.trim(),
-              titleAr: blogTitleAr.trim() || undefined,
-              date: blogDate,
-              shortDescription: blogShortDescription.trim(),
-              shortDescriptionAr: blogShortDescriptionAr.trim() || undefined,
-              content: blogContent.trim(),
-              contentAr: blogContentAr.trim() || undefined,
-              image: blogImage,
-              imageAr: blogImageAr || undefined,
-              bannerImage: blogBannerImage,
-              bannerImageAr: blogBannerImageAr || undefined,
-            }
-          : blog
+    try {
+      if (editingBlogId) {
+        const existingBlog = blogs.find((blog) => blog.id === editingBlogId);
+
+        if (!existingBlog) {
+          throw new Error('Blog not found');
+        }
+
+        const savedBlog = await saveBlogToServer(
+          {
+            ...existingBlog,
+            title: blogTitle.trim(),
+            titleAr: blogTitleAr.trim() || undefined,
+            date: blogDate,
+            shortDescription: blogShortDescription.trim(),
+            shortDescriptionAr: blogShortDescriptionAr.trim() || undefined,
+            content: blogContent.trim(),
+            contentAr: blogContentAr.trim() || undefined,
+            image: blogImage,
+            imageAr: blogImageAr || undefined,
+            bannerImage: blogBannerImage,
+            bannerImageAr: blogBannerImageAr || undefined,
+          },
+          user?.email || undefined
+        );
+
+        setBlogs((currentBlogs) => currentBlogs.map((blog) => (blog.id === savedBlog.id ? savedBlog : blog)));
+        resetBlogForm();
+        setBlogFeedback({
+          type: 'success',
+          message: locale === 'ar' ? 'تم تحديث المقالة بنجاح.' : 'Blog updated successfully.',
+        });
+        return;
+      }
+
+      const baseSlug = slugify(blogTitle);
+      const slugExists = blogs.some((blog) => blog.slug === baseSlug);
+      const finalSlug = slugExists ? `${baseSlug}-${Date.now()}` : baseSlug;
+
+      const savedBlog = await saveBlogToServer(
+        {
+          id: crypto.randomUUID(),
+          slug: finalSlug,
+          title: blogTitle.trim(),
+          titleAr: blogTitleAr.trim() || undefined,
+          date: blogDate,
+          shortDescription: blogShortDescription.trim(),
+          shortDescriptionAr: blogShortDescriptionAr.trim() || undefined,
+          content: blogContent.trim(),
+          contentAr: blogContentAr.trim() || undefined,
+          image: blogImage,
+          imageAr: blogImageAr || undefined,
+          bannerImage: blogBannerImage,
+          bannerImageAr: blogBannerImageAr || undefined,
+          createdAt: Date.now(),
+        },
+        user?.email || undefined
       );
 
-      writeBlogsToStorage(nextBlogs);
-      setBlogs(nextBlogs);
+      setBlogs((currentBlogs) => [savedBlog, ...currentBlogs.filter((blog) => blog.id !== savedBlog.id)]);
       resetBlogForm();
       setBlogFeedback({
         type: 'success',
-        message: locale === 'ar' ? 'تم تحديث المقالة بنجاح.' : 'Blog updated successfully.',
+        message: locale === 'ar' ? 'تم إنشاء المقالة بنجاح.' : 'Blog created successfully.',
       });
-      return;
+    } catch (error) {
+      console.error('Save blog error:', error);
+      setBlogFeedback({
+        type: 'error',
+        message: locale === 'ar' ? 'تعذر حفظ المقالة.' : 'Failed to save blog.',
+      });
     }
-
-    const baseSlug = slugify(blogTitle);
-    const slugExists = blogs.some((blog) => blog.slug === baseSlug);
-    const finalSlug = slugExists ? `${baseSlug}-${Date.now()}` : baseSlug;
-
-    const newBlog: BlogPost = {
-      id: crypto.randomUUID(),
-      slug: finalSlug,
-      title: blogTitle.trim(),
-      titleAr: blogTitleAr.trim() || undefined,
-      date: blogDate,
-      shortDescription: blogShortDescription.trim(),
-      shortDescriptionAr: blogShortDescriptionAr.trim() || undefined,
-      content: blogContent.trim(),
-      contentAr: blogContentAr.trim() || undefined,
-      image: blogImage,
-      imageAr: blogImageAr || undefined,
-      bannerImage: blogBannerImage,
-      bannerImageAr: blogBannerImageAr || undefined,
-      createdAt: Date.now(),
-    };
-
-    const nextBlogs = [newBlog, ...blogs];
-    writeBlogsToStorage(nextBlogs);
-    setBlogs(nextBlogs);
-
-    resetBlogForm();
-    setBlogFeedback({
-      type: 'success',
-      message: locale === 'ar' ? 'تم إنشاء المقالة بنجاح.' : 'Blog created successfully.',
-    });
   };
 
   if (loading) {
@@ -957,7 +984,7 @@ export default function Dashboard() {
                       subAr: bannerCardSubAr.trim(),
                     };
                     try {
-                      await saveBlogsPageBannerConfigToCloud({
+                      await saveBlogsPageBannerConfigToServer({
                         bannerUrl: blogsPageBanner,
                         card,
                         updatedBy: user?.email || undefined,
@@ -1246,7 +1273,7 @@ export default function Dashboard() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteBlog(blog.id)}
+                          onClick={() => { void handleDeleteBlog(blog.id); }}
                           className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors"
                         >
                           {locale === 'ar' ? 'حذف' : 'Delete'}

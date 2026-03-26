@@ -1,6 +1,3 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-
 export interface BlogPost {
   id: string;
   slug: string;
@@ -29,13 +26,10 @@ export interface BlogsBannerCard {
   subAr: string;
 }
 
-interface BlogsPageBannerConfig {
+export interface BlogsPageBannerConfig {
   bannerUrl: string;
   card: BlogsBannerCard;
 }
-
-const BLOGS_CONFIG_COLLECTION = 'siteContent';
-const BLOGS_BANNER_CONFIG_DOC = 'blogsPageBanner';
 
 export const slugify = (value: string): string =>
   value
@@ -75,6 +69,85 @@ export const writeBlogsToStorage = (blogs: BlogPost[]) => {
   localStorage.setItem(BLOGS_STORAGE_KEY, JSON.stringify(blogs));
 };
 
+export const loadBlogsFromServer = async (): Promise<BlogPost[]> => {
+  try {
+    const response = await fetch('/api/blogs', { cache: 'no-store' });
+    const result = await response.json() as { success?: boolean; blogs?: BlogPost[] };
+
+    if (!response.ok || !result.success || !Array.isArray(result.blogs)) {
+      throw new Error('Failed to load blogs');
+    }
+
+    const blogs = result.blogs.sort((a, b) => b.createdAt - a.createdAt);
+
+    writeBlogsToStorage(blogs);
+    return blogs;
+  } catch {
+    return readBlogsFromStorage();
+  }
+};
+
+export const loadBlogBySlugFromServer = async (slug: string): Promise<BlogPost | null> => {
+  try {
+    const response = await fetch(`/api/blogs/slug/${encodeURIComponent(slug)}`, { cache: 'no-store' });
+    const result = await response.json() as { success?: boolean; blog?: BlogPost };
+
+    if (!response.ok || !result.success || !result.blog) {
+      throw new Error('Failed to load blog');
+    }
+
+    return result.blog;
+  } catch {
+    const localBlogs = readBlogsFromStorage();
+    return localBlogs.find((item) => item.slug === slug) || null;
+  }
+};
+
+export const saveBlogToServer = async (blog: BlogPost, updatedBy?: string): Promise<BlogPost> => {
+  const response = await fetch('/api/blogs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ blog, updatedBy }),
+  });
+
+  const result = await response.json() as { success?: boolean; blog?: BlogPost; message?: string };
+
+  if (!response.ok || !result.success || !result.blog) {
+    throw new Error(result.message || 'Failed to save blog');
+  }
+
+  const savedBlog = result.blog;
+
+  const localBlogs = readBlogsFromStorage();
+  const existingIndex = localBlogs.findIndex((item) => item.id === savedBlog.id);
+  const nextBlogs = [...localBlogs];
+
+  if (existingIndex >= 0) {
+    nextBlogs[existingIndex] = savedBlog;
+  } else {
+    nextBlogs.unshift(savedBlog);
+  }
+
+  writeBlogsToStorage(nextBlogs.sort((a, b) => b.createdAt - a.createdAt));
+
+  return savedBlog;
+};
+
+export const deleteBlogFromServer = async (blogId: string) => {
+  const response = await fetch(`/api/blogs/${encodeURIComponent(blogId)}`, {
+    method: 'DELETE',
+  });
+
+  const result = await response.json() as { success?: boolean; message?: string };
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || 'Failed to delete blog');
+  }
+
+  const nextBlogs = readBlogsFromStorage().filter((blog) => blog.id !== blogId);
+  writeBlogsToStorage(nextBlogs);
+};
+
 export const readBlogsPageBannerFromStorage = (): string => {
   if (typeof window === 'undefined') {
     return '';
@@ -111,33 +184,20 @@ export const writeBlogsPageBannerCardToStorage = (card: BlogsBannerCard) => {
   localStorage.setItem(BLOGS_PAGE_BANNER_CARD_STORAGE_KEY, JSON.stringify(card));
 };
 
-export const loadBlogsPageBannerConfigFromCloud = async (): Promise<BlogsPageBannerConfig> => {
+export const loadBlogsPageBannerConfigFromServer = async (): Promise<BlogsPageBannerConfig> => {
   const localCard = readBlogsPageBannerCardFromStorage();
   const localBanner = readBlogsPageBannerFromStorage();
 
   try {
-    const configRef = doc(db, BLOGS_CONFIG_COLLECTION, BLOGS_BANNER_CONFIG_DOC);
-    const snapshot = await getDoc(configRef);
+    const response = await fetch('/api/blogs/banner-config', { cache: 'no-store' });
+    const result = await response.json() as { success?: boolean; config?: BlogsPageBannerConfig };
 
-    if (!snapshot.exists()) {
-      return {
-        bannerUrl: localBanner,
-        card: localCard,
-      };
+    if (!response.ok || !result.success || !result.config) {
+      throw new Error('Failed to load banner config');
     }
 
-    const data = snapshot.data() as {
-      bannerUrl?: string;
-      card?: Partial<BlogsBannerCard>;
-    };
-
-    const cloudBanner = data.bannerUrl || '';
-    const cloudCard = {
-      titleEn: data.card?.titleEn || '',
-      titleAr: data.card?.titleAr || '',
-      subEn: data.card?.subEn || '',
-      subAr: data.card?.subAr || '',
-    };
+    const cloudBanner = result.config.bannerUrl || '';
+    const cloudCard = result.config.card;
 
     writeBlogsPageBannerToStorage(cloudBanner);
     writeBlogsPageBannerCardToStorage(cloudCard);
@@ -154,7 +214,7 @@ export const loadBlogsPageBannerConfigFromCloud = async (): Promise<BlogsPageBan
   }
 };
 
-export const saveBlogsPageBannerConfigToCloud = async (payload: {
+export const saveBlogsPageBannerConfigToServer = async (payload: {
   bannerUrl?: string;
   card?: BlogsBannerCard;
   updatedBy?: string;
@@ -165,15 +225,24 @@ export const saveBlogsPageBannerConfigToCloud = async (payload: {
   writeBlogsPageBannerToStorage(localBanner);
   writeBlogsPageBannerCardToStorage(localCard);
 
-  const configRef = doc(db, BLOGS_CONFIG_COLLECTION, BLOGS_BANNER_CONFIG_DOC);
-  await setDoc(
-    configRef,
-    {
+  const response = await fetch('/api/blogs/banner-config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
       bannerUrl: localBanner,
       card: localCard,
-      updatedBy: payload.updatedBy || null,
-      updatedAt: Date.now(),
-    },
-    { merge: true }
-  );
+      updatedBy: payload.updatedBy,
+    }),
+  });
+
+  const result = await response.json() as { success?: boolean; config?: BlogsPageBannerConfig; message?: string };
+
+  if (!response.ok || !result.success || !result.config) {
+    throw new Error(result.message || 'Failed to save banner config');
+  }
+
+  writeBlogsPageBannerToStorage(result.config.bannerUrl);
+  writeBlogsPageBannerCardToStorage(result.config.card);
+
+  return result.config;
 };
