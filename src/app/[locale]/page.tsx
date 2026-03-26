@@ -107,7 +107,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/0"></div>
 
         {/* Right Bottom Badge - Section Level */}
-        <div className="hidden md:flex absolute bottom-20 right-20 flex-col items-center select-none gap-1 z-20">
+        <div className={`hidden xl:flex absolute bottom-14 ${isRTL ? 'left-10 2xl:left-20' : 'right-10 2xl:right-20'} flex-col items-center select-none gap-1 z-20`}>
           <span className="text-8xl font-bold text-white leading-none" style={{ fontFamily: '"Mizra", "Times New Roman", serif' }}>{count}</span>
           <span className="text-lg text-white leading-none font-medium" style={{ fontFamily: '"Mizra", "Times New Roman", serif' }}>{isRTL ? "سنة" : "Years"}</span>
           <span className="text-base text-white/80 font-medium text-center" style={{ fontFamily: '"Mizra", "Times New Roman", serif' }}>
