@@ -341,29 +341,11 @@ export default function Dashboard() {
 
     try {
       setIsAccessActionLoading(true);
-      const approvalResult = await withTimeout(
-        approveDashboardAccess(
-          normalizedInviteEmail,
-          user.email,
-          permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
-        ),
-        25000
+      await approveDashboardAccess(
+        normalizedInviteEmail,
+        user.email,
+        permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
       );
-
-      if (approvalResult.timedOut) {
-        setAccessFeedback({
-          type: 'error',
-          message:
-            locale === 'ar'
-              ? 'استغرق حفظ الموافقة وقتا اطول من المتوقع. يرجى المحاولة مرة اخرى.'
-              : 'Saving approval took too long. Please try again.',
-        });
-        return;
-      }
-
-      if (approvalResult.error) {
-        throw approvalResult.error;
-      }
 
       const { response: inviteResponse, result: inviteResult } = await sendInvitationEmail({
         email: normalizedInviteEmail,
@@ -415,25 +397,7 @@ export default function Dashboard() {
 
     try {
       setIsAccessActionLoading(true);
-      const requestResult = await withTimeout(
-        ensureDashboardAccessRequest(normalizedInviteEmail),
-        25000
-      );
-
-      if (requestResult.timedOut) {
-        setAccessFeedback({
-          type: 'error',
-          message:
-            locale === 'ar'
-              ? 'استغرق حفظ طلب الوصول وقتا اطول من المتوقع. اضغط تحديث القائمة او حاول مرة اخرى.'
-              : 'Saving access request took too long. Click Refresh List or try again.',
-        });
-        return;
-      }
-
-      if (requestResult.error) {
-        throw requestResult.error;
-      }
+      await ensureDashboardAccessRequest(normalizedInviteEmail);
 
       const { response: inviteResponse, result: inviteResult } = await sendInvitationEmail({
         email: normalizedInviteEmail,
