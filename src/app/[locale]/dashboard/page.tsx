@@ -341,11 +341,29 @@ export default function Dashboard() {
 
     try {
       setIsAccessActionLoading(true);
-      await approveDashboardAccess(
-        normalizedInviteEmail,
-        user.email,
-        permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
+      const approvalSave = await withTimeout(
+        approveDashboardAccess(
+          normalizedInviteEmail,
+          user.email,
+          permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
+        ),
+        12000
       );
+
+      if (approvalSave.timedOut) {
+        setAccessFeedback({
+          type: 'error',
+          message:
+            locale === 'ar'
+              ? 'استغرق حفظ الموافقة وقتا طويلا. حاول مرة أخرى أو اضغط تحديث القائمة.'
+              : 'Approval save took too long. Try again or click Refresh List.',
+        });
+        return;
+      }
+
+      if (approvalSave.error) {
+        throw approvalSave.error;
+      }
 
       const { response: inviteResponse, result: inviteResult } = await sendInvitationEmail({
         email: normalizedInviteEmail,
@@ -397,7 +415,19 @@ export default function Dashboard() {
 
     try {
       setIsAccessActionLoading(true);
-      await ensureDashboardAccessRequest(normalizedInviteEmail);
+      const requestSave = await withTimeout(ensureDashboardAccessRequest(normalizedInviteEmail), 12000);
+
+      if (requestSave.timedOut) {
+        setAccessFeedback({
+          type: 'error',
+          message:
+            locale === 'ar'
+              ? 'استغرق حفظ طلب الوصول وقتا طويلا. تم إرسال الدعوة البريدية على أي حال.'
+              : 'Saving access request took too long. Invitation email will still be attempted.',
+        });
+      } else if (requestSave.error) {
+        throw requestSave.error;
+      }
 
       const { response: inviteResponse, result: inviteResult } = await sendInvitationEmail({
         email: normalizedInviteEmail,
@@ -526,9 +556,14 @@ export default function Dashboard() {
       });
     } catch (error) {
       console.error('Image upload error:', error);
+      const detailedMessage = error instanceof Error && error.message
+        ? error.message
+        : locale === 'ar'
+          ? 'فشل رفع الصورة. تأكد من إعدادات ImageKit.'
+          : 'Image upload failed. Check ImageKit configuration.';
       setBlogFeedback({
         type: 'error',
-        message: locale === 'ar' ? 'فشل رفع الصورة. تأكد من إعدادات ImageKit.' : 'Image upload failed. Check ImageKit configuration.',
+        message: detailedMessage,
       });
     } finally {
       if (target === 'card') {
@@ -601,9 +636,14 @@ export default function Dashboard() {
       });
     } catch (error) {
       console.error('Blogs page banner upload error:', error);
+      const detailedMessage = error instanceof Error && error.message
+        ? error.message
+        : locale === 'ar'
+          ? 'فشل رفع بانر الصفحة.'
+          : 'Blogs page banner upload failed.';
       setBlogFeedback({
         type: 'error',
-        message: locale === 'ar' ? 'فشل رفع بانر الصفحة.' : 'Blogs page banner upload failed.',
+        message: detailedMessage,
       });
     } finally {
       setIsUploadingPageBanner(false);

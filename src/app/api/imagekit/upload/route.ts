@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ImageKit, toFile } from '@imagekit/nodejs';
 
 const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 const imagekit = privateKey
   ? new ImageKit({ privateKey })
@@ -23,17 +24,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'No file uploaded.' }, { status: 400 });
     }
 
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ success: false, message: 'Only image files are allowed.' }, { status: 400 });
+    }
+
+    if (file.size > MAX_IMAGE_BYTES) {
+      return NextResponse.json(
+        { success: false, message: 'Image is too large. Maximum allowed size is 10MB.' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
     const uploadable = await toFile(buffer, fileName, { type: file.type });
 
-    const uploaded = await imagekit.files.upload({
+    const uploadPromise = imagekit.files.upload({
       file: uploadable,
       fileName,
       folder: '/almahy/blogs',
       useUniqueFileName: true,
     });
+
+    const uploaded = await Promise.race([
+      uploadPromise,
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Image upload timed out. Please try again.')), 15000);
+      }),
+    ]);
 
     return NextResponse.json({
       success: true,
