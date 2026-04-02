@@ -9,7 +9,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signOut,
+  User,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Locale } from '@/lib/translations';
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [authActionInProgress, setAuthActionInProgress] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const primaryAdminEmail = getPrimaryAdminEmail();
 
@@ -69,26 +70,62 @@ export default function LoginPage() {
   const t = content[isArabic ? 'ar' : 'en'];
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (authActionInProgress) {
+    let isCancelled = false;
+
+    const handleExistingUser = async (user: User | null) => {
+      if (isCancelled || authActionInProgress) {
         return;
       }
 
       if (!user?.email) {
+        setCheckingSession(false);
         return;
       }
 
       const access = await ensureDashboardAccessRequest(user.email);
       if (access?.status === 'active') {
-        router.push(`/${locale}/dashboard`);
+        router.replace(`/${locale}/dashboard`);
         return;
       }
 
-      router.push('/portal');
+      router.replace('/portal');
+    };
+
+    const bootstrapSession = async () => {
+      if (typeof auth.authStateReady === 'function') {
+        await auth.authStateReady();
+      }
+
+      if (isCancelled) {
+        return;
+      }
+
+      await handleExistingUser(auth.currentUser);
+    };
+
+    void bootstrapSession();
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      void handleExistingUser(user);
     });
 
-    return () => unsubscribe();
+    return () => {
+      isCancelled = true;
+      unsubscribe();
+    };
   }, [authActionInProgress, locale, router]);
+
+  if (checkingSession && !authActionInProgress) {
+    return (
+      <main className="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-24">
+        <div className="mx-auto flex min-h-[50vh] w-full max-w-md items-center justify-center rounded-2xl border border-amber-200/20 bg-white/[0.03] p-7 md:p-8 shadow-2xl backdrop-blur-sm">
+          <p className="text-center text-sm text-slate-300 md:text-base">
+            {isArabic ? 'جارٍ التحقق من الجلسة...' : 'Checking your session...'}
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   const validateInputs = () => {
     const normalizedEmail = normalizeEmail(email);
@@ -122,13 +159,15 @@ export default function LoginPage() {
 
       if (access?.status === 'active') {
         setFeedback({ type: 'success', message: isArabic ? 'تم تسجيل الدخول بنجاح.' : 'Logged in successfully.' });
-        router.push(`/${locale}/dashboard`);
+        router.replace(`/${locale}/dashboard`);
         return;
       }
 
-      router.push('/portal');
-    } catch (error: any) {
-      const code = error?.code as string | undefined;
+      router.replace('/portal');
+    } catch (error: unknown) {
+      const code = typeof error === 'object' && error !== null && 'code' in error
+        ? String((error as { code?: string }).code)
+        : undefined;
       let message = isArabic ? 'حدث خطأ غير متوقع.' : 'Unexpected error occurred.';
 
       if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
@@ -157,11 +196,11 @@ export default function LoginPage() {
       const access = signedInEmail ? await ensureDashboardAccessRequest(signedInEmail) : null;
 
       if (access?.status === 'active') {
-        router.push(`/${locale}/dashboard`);
+        router.replace(`/${locale}/dashboard`);
         return;
       }
 
-      router.push('/portal');
+      router.replace('/portal');
     } catch {
       setFeedback({
         type: 'error',

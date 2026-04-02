@@ -12,9 +12,10 @@ import {
   BLOGS_ONLY_PERMISSIONS,
   DashboardAccessRecord,
   FULL_PERMISSIONS,
+  getCachedDashboardAccess,
+  getCachedDashboardUsers,
   ensurePrimaryAdminAccess,
   ensureDashboardAccessRequest,
-  getDashboardAccess,
   getPrimaryAdminEmail,
   listDashboardUsers,
   normalizeEmail,
@@ -26,13 +27,9 @@ import {
   deleteBlogFromServer,
   loadBlogsFromServer,
   loadBlogsPageBannerConfigFromServer,
-  readBlogsFromStorage,
-  readBlogsPageBannerCardFromStorage,
-  readBlogsPageBannerFromStorage,
   saveBlogToServer,
   saveBlogsPageBannerConfigToServer,
   slugify,
-  writeBlogsPageBannerCardToStorage,
 } from '@/lib/blogs';
 
 export default function Dashboard() {
@@ -81,11 +78,62 @@ export default function Dashboard() {
     calls: false,
   });
   const primaryAdminEmail = getPrimaryAdminEmail();
+  const effectiveUser = user || auth.currentUser;
+
+  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<{ timedOut: boolean; value?: T; error?: unknown }> => {
+    return new Promise((resolve) => {
+      let completed = false;
+
+      const timeoutId = setTimeout(() => {
+        if (!completed) {
+          completed = true;
+          resolve({ timedOut: true });
+        }
+      }, timeoutMs);
+
+      promise
+        .then((value) => {
+          if (completed) {
+            return;
+          }
+          completed = true;
+          clearTimeout(timeoutId);
+          resolve({ timedOut: false, value });
+        })
+        .catch((error) => {
+          if (completed) {
+            return;
+          }
+          completed = true;
+          clearTimeout(timeoutId);
+          resolve({ timedOut: false, error });
+        });
+    });
+  };
+
+  const sendInvitationEmail = async (payload: { email: string; locale: string; type?: 'invite' | 'approved' }) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const response = await fetch('/api/invitations/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      const result = await response.json().catch(() => ({}));
+      return { response, result };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
 
   const loadAccessUsers = async () => {
     try {
       const nextUsers = await listDashboardUsers();
-      setAccessUsers(nextUsers);
+      setAccessUsers((currentUsers) => (nextUsers.length === 0 && currentUsers.length > 0 ? currentUsers : nextUsers));
     } catch (error) {
       console.error('Load access users error:', error);
       setAccessFeedback({
@@ -95,8 +143,21 @@ export default function Dashboard() {
     }
   };
 
+  const applyAccessState = (access: DashboardAccessRecord | null) => {
+    if (!access) {
+      setAccessRole(null);
+      setAllowedSections({ dashboard: true, blogs: false, transactions: false, calls: false });
+      setAccessDenied(true);
+      return;
+    }
+
+    setAccessRole(access.role);
+    setAllowedSections(access.permissions || { dashboard: true, blogs: true, transactions: false, calls: false });
+    setAccessDenied(false);
+  };
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+    const bootstrapDashboardUser = (currentUser: User | null) => {
       if (!currentUser?.email) {
         setUser(null);
         setAccessRole(null);
@@ -107,64 +168,132 @@ export default function Dashboard() {
         return;
       }
 
-      try {
-        const email = normalizeEmail(currentUser.email);
+      const email = normalizeEmail(currentUser.email);
+      setUser(currentUser);
 
-        if (email === primaryAdminEmail) {
-          setUser(currentUser);
-          setAccessRole('admin');
-          setAllowedSections({ dashboard: true, blogs: true, transactions: true, calls: true });
-          setAccessDenied(false);
-          setLoading(false);
+      if (email === primaryAdminEmail) {
+        const cachedUsers = getCachedDashboardUsers();
+        const fallbackAdminUser: DashboardAccessRecord = {
+          email,
+          role: 'admin',
+          status: 'active',
+          permissions: FULL_PERMISSIONS,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
 
-          void ensurePrimaryAdminAccess(email)
-            .then(() => loadAccessUsers())
-            .catch((error) => {
-              console.error('Primary admin access sync warning:', error);
-            });
-
-          return;
-        }
-
-        const access = await ensureDashboardAccessRequest(email);
-
-        if (!access) {
-          setUser(currentUser);
-          setAccessRole(null);
-          setAccessDenied(true);
-          setLoading(false);
-          return;
-        }
-
-        setUser(currentUser);
-        setAccessRole(access.role);
-        setAllowedSections(access.permissions || { dashboard: true, blogs: true, transactions: false, calls: false });
+        setAccessRole('admin');
+        setAllowedSections({ dashboard: true, blogs: true, transactions: true, calls: true });
+        setAccessUsers(cachedUsers.length > 0 ? cachedUsers : [fallbackAdminUser]);
         setAccessDenied(false);
         setLoading(false);
 
-        if (access.role === 'admin') {
-          void loadAccessUsers();
-        }
-      } catch (error) {
-        console.error('Dashboard access error:', error);
-        setAccessDenied(true);
-        setLoading(false);
+        void withTimeout(ensurePrimaryAdminAccess(email), 10000)
+          .then((result) => {
+            if (result.error) {
+              throw result.error;
+            }
+
+            if (!result.timedOut) {
+              void loadAccessUsers();
+            }
+          })
+          .catch((error) => {
+            console.error('Primary admin access sync warning:', error);
+          });
+
+        return;
       }
+
+      const cachedAccess = getCachedDashboardAccess(email);
+      applyAccessState(cachedAccess);
+      setLoading(false);
+
+      void withTimeout(ensureDashboardAccessRequest(email), 10000)
+        .then((result) => {
+          if (result.error) {
+            throw result.error;
+          }
+
+          const fallbackPendingAccess: DashboardAccessRecord = {
+            email,
+            role: 'editor',
+            status: 'pending',
+            permissions: BLOGS_ONLY_PERMISSIONS,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          };
+
+          const access = result.timedOut
+            ? cachedAccess || fallbackPendingAccess
+            : result.value || null;
+
+          applyAccessState(access);
+
+          if (access?.role === 'admin') {
+            void loadAccessUsers();
+          }
+        })
+        .catch((error) => {
+          console.error('Dashboard access error:', error);
+          if (!cachedAccess) {
+            setAccessDenied(true);
+          }
+        });
+    };
+
+    bootstrapDashboardUser(auth.currentUser);
+
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      bootstrapDashboardUser(currentUser);
     });
 
     return () => unsubscribe();
   }, [router, locale, primaryAdminEmail]);
 
   useEffect(() => {
-    setBlogs(readBlogsFromStorage());
+    if (!loading) {
+      return;
+    }
 
-    const localCard = readBlogsPageBannerCardFromStorage();
-    setBlogsPageBanner(readBlogsPageBannerFromStorage());
-    setBannerCardTitleEn(localCard.titleEn);
-    setBannerCardTitleAr(localCard.titleAr);
-    setBannerCardSubEn(localCard.subEn);
-    setBannerCardSubAr(localCard.subAr);
+    const timeoutId = setTimeout(() => {
+      const fallbackUser = auth.currentUser;
 
+      if (!fallbackUser?.email) {
+        setLoading(false);
+        return;
+      }
+
+      const email = normalizeEmail(fallbackUser.email);
+      setUser(fallbackUser);
+
+      if (email === primaryAdminEmail) {
+        const cachedUsers = getCachedDashboardUsers();
+        setAccessRole('admin');
+        setAllowedSections({ dashboard: true, blogs: true, transactions: true, calls: true });
+        setAccessUsers(cachedUsers);
+        setAccessDenied(false);
+        setLoading(false);
+        return;
+      }
+
+      const cachedAccess = getCachedDashboardAccess(email) || {
+        email,
+        role: 'editor' as const,
+        status: 'pending' as const,
+        permissions: BLOGS_ONLY_PERMISSIONS,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+
+      applyAccessState(cachedAccess);
+      setLoading(false);
+    }, 2500);
+
+    return () => clearTimeout(timeoutId);
+  }, [loading, primaryAdminEmail]);
+
+  useEffect(() => {
     const loadServerContent = async () => {
       const [serverBlogs, bannerConfig] = await Promise.all([
         loadBlogsFromServer(),
@@ -188,6 +317,12 @@ export default function Dashboard() {
     }
   }, [activeSection, allowedSections.blogs]);
 
+  useEffect(() => {
+    if (activeSection === 'access' && accessRole !== 'admin') {
+      setActiveSection('dashboard');
+    }
+  }, [activeSection, accessRole]);
+
   const handleApproveAccess = async (emailToApprove?: string) => {
     if (!user?.email) {
       return;
@@ -206,18 +341,35 @@ export default function Dashboard() {
 
     try {
       setIsAccessActionLoading(true);
-      await approveDashboardAccess(
-        normalizedInviteEmail,
-        user.email,
-        permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
+      const approvalResult = await withTimeout(
+        approveDashboardAccess(
+          normalizedInviteEmail,
+          user.email,
+          permissionPreset === 'all' ? FULL_PERMISSIONS : BLOGS_ONLY_PERMISSIONS
+        ),
+        25000
       );
 
-      const inviteResponse = await fetch('/api/invitations/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: normalizedInviteEmail, locale }),
+      if (approvalResult.timedOut) {
+        setAccessFeedback({
+          type: 'error',
+          message:
+            locale === 'ar'
+              ? 'استغرق حفظ الموافقة وقتا اطول من المتوقع. يرجى المحاولة مرة اخرى.'
+              : 'Saving approval took too long. Please try again.',
+        });
+        return;
+      }
+
+      if (approvalResult.error) {
+        throw approvalResult.error;
+      }
+
+      const { response: inviteResponse, result: inviteResult } = await sendInvitationEmail({
+        email: normalizedInviteEmail,
+        locale,
+        type: 'approved',
       });
-      const inviteResult = await inviteResponse.json();
 
       setInviteEmail('');
       setAccessFeedback({
@@ -226,16 +378,23 @@ export default function Dashboard() {
           ? locale === 'ar'
             ? 'تمت الموافقة وإرسال رسالة الدعوة عبر البريد الإلكتروني.'
             : 'Access approved and invitation email sent successfully.'
-          : locale === 'ar'
-            ? 'تمت الموافقة لكن فشل إرسال البريد. تحقق من إعدادات Resend.'
-            : 'Access approved, but invitation email failed to send. Check Resend configuration.',
+          : (typeof inviteResult?.message === 'string' && inviteResult.message.trim())
+            ? inviteResult.message
+            : locale === 'ar'
+              ? 'تمت الموافقة لكن فشل إرسال البريد. تحقق من إعدادات Resend.'
+              : 'Access approved, but invitation email failed to send. Check Resend configuration.',
       });
       await loadAccessUsers();
     } catch (error) {
       console.error('Approve access error:', error);
       setAccessFeedback({
         type: 'error',
-        message: locale === 'ar' ? 'تعذر منح الموافقة.' : 'Unable to approve access.',
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : locale === 'ar'
+              ? 'تعذر منح الموافقة.'
+              : 'Unable to approve access.',
       });
     } finally {
       setIsAccessActionLoading(false);
@@ -256,14 +415,31 @@ export default function Dashboard() {
 
     try {
       setIsAccessActionLoading(true);
-      await ensureDashboardAccessRequest(normalizedInviteEmail);
+      const requestResult = await withTimeout(
+        ensureDashboardAccessRequest(normalizedInviteEmail),
+        25000
+      );
 
-      const inviteResponse = await fetch('/api/invitations/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: normalizedInviteEmail, locale, type: 'invite' }),
+      if (requestResult.timedOut) {
+        setAccessFeedback({
+          type: 'error',
+          message:
+            locale === 'ar'
+              ? 'استغرق حفظ طلب الوصول وقتا اطول من المتوقع. اضغط تحديث القائمة او حاول مرة اخرى.'
+              : 'Saving access request took too long. Click Refresh List or try again.',
+        });
+        return;
+      }
+
+      if (requestResult.error) {
+        throw requestResult.error;
+      }
+
+      const { response: inviteResponse, result: inviteResult } = await sendInvitationEmail({
+        email: normalizedInviteEmail,
+        locale,
+        type: 'invite',
       });
-      const inviteResult = await inviteResponse.json();
 
       setAccessFeedback({
         type: inviteResponse.ok && inviteResult?.success ? 'success' : 'error',
@@ -271,9 +447,11 @@ export default function Dashboard() {
           ? locale === 'ar'
             ? 'تم إرسال دعوة الوصول بنجاح.'
             : 'Access invitation email sent successfully.'
-          : locale === 'ar'
-            ? 'تعذر إرسال الدعوة. تحقق من إعدادات Resend.'
-            : 'Failed to send invitation. Check Resend configuration.',
+          : (typeof inviteResult?.message === 'string' && inviteResult.message.trim())
+            ? inviteResult.message
+            : locale === 'ar'
+              ? 'تعذر إرسال الدعوة. تحقق من إعدادات Resend.'
+              : 'Failed to send invitation. Check Resend configuration.',
       });
 
       await loadAccessUsers();
@@ -281,7 +459,12 @@ export default function Dashboard() {
       console.error('Send invitation error:', error);
       setAccessFeedback({
         type: 'error',
-        message: locale === 'ar' ? 'تعذر إرسال الدعوة.' : 'Unable to send invitation.',
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : locale === 'ar'
+              ? 'تعذر إرسال الدعوة.'
+              : 'Unable to send invitation.',
       });
     } finally {
       setIsAccessActionLoading(false);
@@ -592,7 +775,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
+  if (loading && !effectiveUser?.email) {
     return (
       <div className="min-h-screen bg-[#F1EFF0]">
         <div className="flex justify-center items-center h-screen">
@@ -616,8 +799,8 @@ export default function Dashboard() {
           </p>
           <p className="mb-4 rounded-xl border border-[#CECDCB] bg-[#F8F7F7] px-4 py-3 text-sm text-slate-600">
             {locale === 'ar'
-              ? `أنت مسجل الدخول بواسطة: ${user?.email || 'غير معروف'}`
-              : `Signed in as: ${user?.email || 'Unknown'}`}
+              ? `أنت مسجل الدخول بواسطة: ${effectiveUser?.email || 'غير معروف'}`
+              : `Signed in as: ${effectiveUser?.email || 'Unknown'}`}
           </p>
           <p className="mb-6 rounded-xl border border-[#CECDCB] bg-[#F8F7F7] px-4 py-3 text-sm text-slate-600">
             {locale === 'ar'
@@ -669,6 +852,17 @@ export default function Dashboard() {
               {locale === 'ar' ? 'إدارة المدونة' : 'Blogs'}
             </button>
           ) : null}
+          {accessRole === 'admin' ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('access')}
+              className={`w-full rounded-xl px-4 py-3 font-semibold text-left transition-colors ${
+                activeSection === 'access' ? 'bg-[#DE3B34] text-white' : 'text-white/80 hover:bg-white/10'
+              }`}
+            >
+              {locale === 'ar' ? 'إدارة المستخدمين' : 'Users Access'}
+            </button>
+          ) : null}
           {allowedSections.transactions ? (
             <div className="rounded-xl px-4 py-3 text-white/80 pointer-events-none">
               {locale === 'ar' ? 'المعاملات' : 'Transactions'}
@@ -697,7 +891,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className={`md:hidden mb-4 grid gap-2 ${allowedSections.blogs ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <div className={`md:hidden mb-4 grid gap-2 ${allowedSections.blogs && accessRole === 'admin' ? 'grid-cols-3' : allowedSections.blogs || accessRole === 'admin' ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <button
             type="button"
             onClick={() => setActiveSection('dashboard')}
@@ -718,6 +912,17 @@ export default function Dashboard() {
               {locale === 'ar' ? 'المدونة' : 'Blogs'}
             </button>
           ) : null}
+          {accessRole === 'admin' ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('access')}
+              className={`rounded-xl px-4 py-2.5 font-semibold transition-colors ${
+                activeSection === 'access' ? 'bg-[#DE3B34] text-white' : 'bg-white text-[#160A0A]'
+              }`}
+            >
+              {locale === 'ar' ? 'المستخدمون' : 'Users'}
+            </button>
+          ) : null}
         </div>
 
         {activeSection === 'dashboard' ? (
@@ -727,8 +932,8 @@ export default function Dashboard() {
             </h1>
             <p className="text-slate-600 mb-8">
               {locale === 'ar'
-                ? `مرحبا ${user?.email || 'المستخدم'}`
-                : `Hello ${user?.email || 'User'}`}
+                ? `مرحبا ${effectiveUser?.email || 'المستخدم'}`
+                : `Hello ${effectiveUser?.email || 'User'}`}
             </p>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -992,8 +1197,7 @@ export default function Dashboard() {
                       setBlogFeedback({ type: 'success', message: locale === 'ar' ? 'تم حفظ نص البطاقة.' : 'Banner card text saved.' });
                     } catch (error) {
                       console.error('Save banner card text error:', error);
-                      writeBlogsPageBannerCardToStorage(card);
-                      setBlogFeedback({ type: 'error', message: locale === 'ar' ? 'تعذر حفظ النص على السحابة. تم حفظه محلياً.' : 'Failed to save card text to cloud. Saved locally instead.' });
+                      setBlogFeedback({ type: 'error', message: locale === 'ar' ? 'تعذر حفظ النص على الخادم.' : 'Failed to save card text to server.' });
                     }
                   }}
                   className="mt-3 rounded-xl bg-[#DE3B34] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#9B0F09] transition-colors"

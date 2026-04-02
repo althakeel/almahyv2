@@ -30,13 +30,12 @@ export default function Navbar({ locale }: NavbarProps) {
   const [authLoading, setAuthLoading] = useState(false);
   const [authFeedback, setAuthFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
-  const isEnServicesPage = pathname === '/en/services';
-  const isTurkiyePage = pathname?.includes('/second-passport/turkiye');
   const isValidLoc = locale === 'en' || locale === 'ar';
   const lang = isValidLoc ? (locale as Locale) : 'en';
   const t = translations[lang];
@@ -127,8 +126,10 @@ export default function Navbar({ locale }: NavbarProps) {
         setAuthPassword('');
         router.push(access?.status === 'active' ? `/${lang}/dashboard` : `/${lang}/login`);
       }, 700);
-    } catch (error: any) {
-      const code = error?.code as string | undefined;
+    } catch (error: unknown) {
+      const code = typeof error === 'object' && error !== null && 'code' in error
+        ? String((error as { code?: string }).code)
+        : undefined;
       let message = lang === 'ar' ? 'حدث خطأ غير متوقع.' : 'Unexpected error occurred.';
 
       if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
@@ -175,8 +176,10 @@ export default function Navbar({ locale }: NavbarProps) {
         setAuthModalOpen(false);
         router.push(access?.status === 'active' ? `/${lang}/dashboard` : `/${lang}/login`);
       }, 600);
-    } catch (error: any) {
-      const code = error?.code as string | undefined;
+    } catch (error: unknown) {
+      const code = typeof error === 'object' && error !== null && 'code' in error
+        ? String((error as { code?: string }).code)
+        : undefined;
       let message = lang === 'ar' ? 'فشل تسجيل الدخول عبر Google.' : 'Google sign-in failed.';
 
       if (code === 'auth/popup-closed-by-user') {
@@ -213,7 +216,8 @@ export default function Navbar({ locale }: NavbarProps) {
     try {
       await signOut(auth);
       setCurrentUser(null);
-    } catch (error: any) {
+      setAccountMenuOpen(false);
+    } catch (error: unknown) {
       console.error('Logout error:', error);
     }
   };
@@ -241,6 +245,16 @@ export default function Navbar({ locale }: NavbarProps) {
     window.addEventListener('scroll', controlNavbar);
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [lastScrollY]);
+
+  useEffect(() => {
+    if (!accountMenuOpen) {
+      return;
+    }
+
+    const closeMenu = () => setAccountMenuOpen(false);
+    window.addEventListener('click', closeMenu);
+    return () => window.removeEventListener('click', closeMenu);
+  }, [accountMenuOpen]);
 
   return (
     <>
@@ -314,42 +328,109 @@ export default function Navbar({ locale }: NavbarProps) {
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true)}
-              className={`font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl ${currentUser ? '' : 'hidden'}`}
-              style={{
-                backgroundColor: '#231111',
-                color: '#F0D4D2',
-                border: '1px solid #7A302C',
-                boxShadow: '0 6px 16px rgba(0,0,0,0.35)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#2A1414'
-                e.currentTarget.style.borderColor = '#A5443E'
-                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.45)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#231111'
-                e.currentTarget.style.borderColor = '#7A302C'
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.35)'
-              }}
-            >
-              {currentUser?.photoURL ? (
-                <img
-                  src={currentUser.photoURL}
-                  alt={currentUser.displayName || currentUser.email || 'User profile'}
-                  className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 1115 0" />
-                </svg>
-              )}
-              <span className="hidden xs:inline md:inline">{lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`}</span>
-              <span className="inline xs:hidden md:hidden">{lang === 'en' ? 'Portal' : 'بوابة'}</span>
-            </button>
+            {currentUser ? (
+              <div
+                className="relative hidden md:block"
+                onMouseEnter={() => setAccountMenuOpen(true)}
+                onMouseLeave={() => setAccountMenuOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setAccountMenuOpen((open) => !open);
+                  }}
+                  className="font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl"
+                  style={{
+                    backgroundColor: '#231111',
+                    color: '#F0D4D2',
+                    border: '1px solid #7A302C',
+                    boxShadow: '0 6px 16px rgba(0,0,0,0.35)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#2A1414';
+                    e.currentTarget.style.borderColor = '#A5443E';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.45)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#231111';
+                    e.currentTarget.style.borderColor = '#7A302C';
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.35)';
+                  }}
+                >
+                  {currentUser.photoURL ? (
+                    <img
+                      src={currentUser.photoURL}
+                      alt={currentUser.displayName || currentUser.email || 'User profile'}
+                      className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 1115 0" />
+                    </svg>
+                  )}
+                  <span className="hidden xs:inline md:inline">{lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`}</span>
+                  <svg className={`h-4 w-4 transition-transform ${accountMenuOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.512a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </button>
+
+                {accountMenuOpen ? (
+                  <div
+                    className="absolute right-0 top-[calc(100%-2px)] w-56 overflow-hidden rounded-2xl border border-[#6C2B27] bg-[#1A0D0D]/95 p-2 shadow-[0_18px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        router.push(`/${lang}/dashboard`);
+                      }}
+                      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#F0D4D2] transition-colors hover:bg-[#2A1414]"
+                    >
+                      <span>{lang === 'ar' ? 'الملف الشخصي' : 'Profile'}</span>
+                      <span className="text-[#B98B89]">/</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        router.push(`/${lang}/dashboard`);
+                      }}
+                      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#F0D4D2] transition-colors hover:bg-[#2A1414]"
+                    >
+                      <span>{lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}</span>
+                      <span className="text-[#B98B89]">/</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleLogout()}
+                      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#FFB6B6] transition-colors hover:bg-[#341313]"
+                    >
+                      <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}</span>
+                      <span className="text-[#D86A64]">/</span>
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {!currentUser ? (
+              <button
+                type="button"
+                onClick={() => setAuthModalOpen(true)}
+                className="font-bold px-4 md:px-7 py-2.5 md:py-3 rounded-full text-xs md:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap shadow-lg hover:shadow-xl"
+                style={{
+                  backgroundColor: '#231111',
+                  color: '#F0D4D2',
+                  border: '1px solid #7A302C',
+                  boxShadow: '0 6px 16px rgba(0,0,0,0.35)'
+                }}
+              >
+                <span>{lang === 'en' ? 'Login / Register' : 'تسجيل الدخول / إنشاء حساب'}</span>
+              </button>
+            ) : null}
 
             {/* Mobile Menu Button */}
             <button
@@ -464,7 +545,11 @@ export default function Navbar({ locale }: NavbarProps) {
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  currentUser ? router.push(`/${lang}/dashboard`) : setAuthModalOpen(true);
+                  if (currentUser) {
+                    router.push(`/${lang}/dashboard`);
+                  } else {
+                    setAuthModalOpen(true);
+                  }
                 }}
                 className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-bold text-[#F0D4D2] transition-all duration-200 shadow-[0_8px_20px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
                 style={{
@@ -486,6 +571,30 @@ export default function Navbar({ locale }: NavbarProps) {
                 ) : null}
                 {currentUser ? (lang === 'en' ? `Hi, ${currentUserLabel}` : `${currentUserLabel} ،مرحباً`) : (lang === 'en' ? 'LOGIN / REGISTER' : 'تسجيل الدخول / إنشاء حساب')}
               </button>
+              {currentUser ? (
+                <div className="space-y-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      router.push(`/${lang}/dashboard`);
+                    }}
+                    className="block w-full rounded-xl border border-[#6C2B27] px-4 py-2.5 text-left text-sm font-semibold text-[#F0D4D2] transition-colors hover:bg-[#241212]"
+                  >
+                    {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      void handleLogout();
+                    }}
+                    className="block w-full rounded-xl border border-[#6C2B27] px-4 py-2.5 text-left text-sm font-semibold text-[#FFB6B6] transition-colors hover:bg-[#241212]"
+                  >
+                    {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         )}

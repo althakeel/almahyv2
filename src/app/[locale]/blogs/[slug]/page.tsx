@@ -4,17 +4,14 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Locale } from '@/lib/translations';
-import { BlogPost, loadBlogBySlugFromServer, readBlogsFromStorage } from '@/lib/blogs';
+import { BlogPost, loadBlogBySlugFromServer } from '@/lib/blogs';
 
 export default function BlogDetailsPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const slug = (params?.slug as string) || '';
   const lang: Locale = locale === 'ar' ? 'ar' : 'en';
-  const [blog, setBlog] = useState<BlogPost | null>(() => {
-    const localBlogs = readBlogsFromStorage();
-    return localBlogs.find((item) => item.slug === slug) || null;
-  });
+  const [blog, setBlog] = useState<BlogPost | null>(null);
 
   useEffect(() => {
     const loadBlog = async () => {

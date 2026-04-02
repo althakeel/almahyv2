@@ -15,10 +15,6 @@ export interface BlogPost {
   createdAt: number;
 }
 
-export const BLOGS_STORAGE_KEY = 'almahy_blogs_posts';
-export const BLOGS_PAGE_BANNER_STORAGE_KEY = 'almahy_blogs_page_banner';
-export const BLOGS_PAGE_BANNER_CARD_STORAGE_KEY = 'almahy_blogs_page_banner_card';
-
 export interface BlogsBannerCard {
   titleEn: string;
   titleAr: string;
@@ -39,36 +35,6 @@ export const slugify = (value: string): string =>
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
 
-export const readBlogsFromStorage = (): BlogPost[] => {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-
-  const raw = localStorage.getItem(BLOGS_STORAGE_KEY);
-  if (!raw) {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as BlogPost[];
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.sort((a, b) => b.createdAt - a.createdAt);
-  } catch {
-    return [];
-  }
-};
-
-export const writeBlogsToStorage = (blogs: BlogPost[]) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  localStorage.setItem(BLOGS_STORAGE_KEY, JSON.stringify(blogs));
-};
-
 export const loadBlogsFromServer = async (): Promise<BlogPost[]> => {
   try {
     const response = await fetch('/api/blogs', { cache: 'no-store' });
@@ -78,12 +44,9 @@ export const loadBlogsFromServer = async (): Promise<BlogPost[]> => {
       throw new Error('Failed to load blogs');
     }
 
-    const blogs = result.blogs.sort((a, b) => b.createdAt - a.createdAt);
-
-    writeBlogsToStorage(blogs);
-    return blogs;
+    return result.blogs.sort((a, b) => b.createdAt - a.createdAt);
   } catch {
-    return readBlogsFromStorage();
+    return [];
   }
 };
 
@@ -98,8 +61,7 @@ export const loadBlogBySlugFromServer = async (slug: string): Promise<BlogPost |
 
     return result.blog;
   } catch {
-    const localBlogs = readBlogsFromStorage();
-    return localBlogs.find((item) => item.slug === slug) || null;
+    return null;
   }
 };
 
@@ -116,21 +78,7 @@ export const saveBlogToServer = async (blog: BlogPost, updatedBy?: string): Prom
     throw new Error(result.message || 'Failed to save blog');
   }
 
-  const savedBlog = result.blog;
-
-  const localBlogs = readBlogsFromStorage();
-  const existingIndex = localBlogs.findIndex((item) => item.id === savedBlog.id);
-  const nextBlogs = [...localBlogs];
-
-  if (existingIndex >= 0) {
-    nextBlogs[existingIndex] = savedBlog;
-  } else {
-    nextBlogs.unshift(savedBlog);
-  }
-
-  writeBlogsToStorage(nextBlogs.sort((a, b) => b.createdAt - a.createdAt));
-
-  return savedBlog;
+  return result.blog;
 };
 
 export const deleteBlogFromServer = async (blogId: string) => {
@@ -143,51 +91,9 @@ export const deleteBlogFromServer = async (blogId: string) => {
   if (!response.ok || !result.success) {
     throw new Error(result.message || 'Failed to delete blog');
   }
-
-  const nextBlogs = readBlogsFromStorage().filter((blog) => blog.id !== blogId);
-  writeBlogsToStorage(nextBlogs);
-};
-
-export const readBlogsPageBannerFromStorage = (): string => {
-  if (typeof window === 'undefined') {
-    return '';
-  }
-
-  return localStorage.getItem(BLOGS_PAGE_BANNER_STORAGE_KEY) || '';
-};
-
-export const writeBlogsPageBannerToStorage = (bannerUrl: string) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  localStorage.setItem(BLOGS_PAGE_BANNER_STORAGE_KEY, bannerUrl);
-};
-
-export const readBlogsPageBannerCardFromStorage = (): BlogsBannerCard => {
-  if (typeof window === 'undefined') {
-    return { titleEn: '', titleAr: '', subEn: '', subAr: '' };
-  }
-
-  const raw = localStorage.getItem(BLOGS_PAGE_BANNER_CARD_STORAGE_KEY);
-  if (!raw) return { titleEn: '', titleAr: '', subEn: '', subAr: '' };
-
-  try {
-    return JSON.parse(raw) as BlogsBannerCard;
-  } catch {
-    return { titleEn: '', titleAr: '', subEn: '', subAr: '' };
-  }
-};
-
-export const writeBlogsPageBannerCardToStorage = (card: BlogsBannerCard) => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(BLOGS_PAGE_BANNER_CARD_STORAGE_KEY, JSON.stringify(card));
 };
 
 export const loadBlogsPageBannerConfigFromServer = async (): Promise<BlogsPageBannerConfig> => {
-  const localCard = readBlogsPageBannerCardFromStorage();
-  const localBanner = readBlogsPageBannerFromStorage();
-
   try {
     const response = await fetch('/api/blogs/banner-config', { cache: 'no-store' });
     const result = await response.json() as { success?: boolean; config?: BlogsPageBannerConfig };
@@ -196,20 +102,14 @@ export const loadBlogsPageBannerConfigFromServer = async (): Promise<BlogsPageBa
       throw new Error('Failed to load banner config');
     }
 
-    const cloudBanner = result.config.bannerUrl || '';
-    const cloudCard = result.config.card;
-
-    writeBlogsPageBannerToStorage(cloudBanner);
-    writeBlogsPageBannerCardToStorage(cloudCard);
-
     return {
-      bannerUrl: cloudBanner,
-      card: cloudCard,
+      bannerUrl: result.config.bannerUrl || '',
+      card: result.config.card,
     };
   } catch {
     return {
-      bannerUrl: localBanner,
-      card: localCard,
+      bannerUrl: '',
+      card: { titleEn: '', titleAr: '', subEn: '', subAr: '' },
     };
   }
 };
@@ -219,18 +119,12 @@ export const saveBlogsPageBannerConfigToServer = async (payload: {
   card?: BlogsBannerCard;
   updatedBy?: string;
 }) => {
-  const localCard = payload.card || readBlogsPageBannerCardFromStorage();
-  const localBanner = payload.bannerUrl ?? readBlogsPageBannerFromStorage();
-
-  writeBlogsPageBannerToStorage(localBanner);
-  writeBlogsPageBannerCardToStorage(localCard);
-
   const response = await fetch('/api/blogs/banner-config', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      bannerUrl: localBanner,
-      card: localCard,
+      bannerUrl: payload.bannerUrl ?? '',
+      card: payload.card ?? { titleEn: '', titleAr: '', subEn: '', subAr: '' },
       updatedBy: payload.updatedBy,
     }),
   });
@@ -240,9 +134,6 @@ export const saveBlogsPageBannerConfigToServer = async (payload: {
   if (!response.ok || !result.success || !result.config) {
     throw new Error(result.message || 'Failed to save banner config');
   }
-
-  writeBlogsPageBannerToStorage(result.config.bannerUrl);
-  writeBlogsPageBannerCardToStorage(result.config.card);
 
   return result.config;
 };

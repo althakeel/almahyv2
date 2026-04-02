@@ -8,9 +8,6 @@ import {
   BlogPost,
   loadBlogsFromServer,
   loadBlogsPageBannerConfigFromServer,
-  readBlogsFromStorage,
-  readBlogsPageBannerCardFromStorage,
-  readBlogsPageBannerFromStorage,
 } from '@/lib/blogs';
 
 export default function BlogsPage() {
@@ -18,16 +15,10 @@ export default function BlogsPage() {
   const locale = (params?.locale as string) || 'en';
   const lang: Locale = locale === 'ar' ? 'ar' : 'en';
   const isRTL = lang === 'ar';
-  const [blogs, setBlogs] = useState<BlogPost[]>(() => readBlogsFromStorage());
-  const [blogsPageBanner, setBlogsPageBanner] = useState(() => readBlogsPageBannerFromStorage());
-  const [bannerCardTitle, setBannerCardTitle] = useState(() => {
-    const localCard = readBlogsPageBannerCardFromStorage();
-    return lang === 'ar' ? localCard.titleAr : localCard.titleEn;
-  });
-  const [bannerCardSub, setBannerCardSub] = useState(() => {
-    const localCard = readBlogsPageBannerCardFromStorage();
-    return lang === 'ar' ? localCard.subAr : localCard.subEn;
-  });
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [blogsPageBanner, setBlogsPageBanner] = useState('');
+  const [bannerCardTitle, setBannerCardTitle] = useState('');
+  const [bannerCardSub, setBannerCardSub] = useState('');
   const fallbackBanner = '/assets/banner/DB1.webp';
 
   useEffect(() => {

@@ -80,9 +80,29 @@ const setCachedAccess = (record: DashboardAccessRecord) => {
   writeAccessCache(cache);
 };
 
+const removeCachedAccess = (email: string) => {
+  const cache = readAccessCache();
+  delete cache[normalizeEmail(email)];
+  writeAccessCache(cache);
+};
+
 const getCachedAccess = (email: string): DashboardAccessRecord | null => {
   const cache = readAccessCache();
   return cache[normalizeEmail(email)] || null;
+};
+
+export const getCachedDashboardAccess = (email: string) => getCachedAccess(email);
+
+export const getCachedDashboardUsers = () => {
+  return Object.values(readAccessCache()).sort((left, right) => {
+    if (left.role !== right.role) {
+      return left.role === 'admin' ? -1 : 1;
+    }
+    if (left.status !== right.status) {
+      return left.status === 'pending' ? -1 : 1;
+    }
+    return left.email.localeCompare(right.email);
+  });
 };
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
@@ -103,9 +123,11 @@ const submitDashboardAccessRequest = async (email: string) => {
 
   try {
     await setDoc(doc(db, DASHBOARD_REQUESTS_COLLECTION, getAccessDocId(normalizedEmail)), payload, { merge: true });
+    setCachedAccess(payload);
     return payload;
   } catch (error) {
     if (isOfflineFirestoreError(error)) {
+      setCachedAccess(payload);
       return payload;
     }
     throw error;
@@ -308,6 +330,19 @@ export const listDashboardUsers = async () => {
       return left.email.localeCompare(right.email);
     });
 
+    const cachedItems = Object.values(readAccessCache());
+    if (items.length === 0 && cachedItems.length > 0) {
+      return cachedItems.sort((left, right) => {
+        if (left.role !== right.role) {
+          return left.role === 'admin' ? -1 : 1;
+        }
+        if (left.status !== right.status) {
+          return left.status === 'pending' ? -1 : 1;
+        }
+        return left.email.localeCompare(right.email);
+      });
+    }
+
     const cache: Record<string, DashboardAccessRecord> = {};
     for (const item of items) {
       cache[normalizeEmail(item.email)] = item;
@@ -337,4 +372,5 @@ export const revokeDashboardAccess = async (email: string) => {
 
   await deleteDoc(doc(db, DASHBOARD_ACCESS_COLLECTION, getAccessDocId(normalizedEmail)));
   await deleteDoc(doc(db, DASHBOARD_REQUESTS_COLLECTION, getAccessDocId(normalizedEmail)));
+  removeCachedAccess(normalizedEmail);
 };

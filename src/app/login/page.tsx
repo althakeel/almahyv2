@@ -9,6 +9,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  User,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { ensureDashboardAccessRequest, getPrimaryAdminEmail, normalizeEmail } from '@/lib/admin-access';
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [authActionInProgress, setAuthActionInProgress] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const primaryAdminEmail = getPrimaryAdminEmail();
 
@@ -41,19 +43,57 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (authActionInProgress) return;
+    let isCancelled = false;
 
-      if (!user?.email) return;
+    const handleExistingUser = async (user: User | null) => {
+      if (isCancelled || authActionInProgress) return;
+
+      if (!user?.email) {
+        setCheckingSession(false);
+        return;
+      }
+
       const access = await ensureDashboardAccessRequest(user.email);
       if (access?.status === 'active') {
-        router.push('/en/dashboard');
+        router.replace('/en/dashboard');
       } else {
-        router.push('/portal');
+        router.replace('/portal');
       }
+    };
+
+    const bootstrapSession = async () => {
+      if (typeof auth.authStateReady === 'function') {
+        await auth.authStateReady();
+      }
+
+      if (isCancelled) {
+        return;
+      }
+
+      await handleExistingUser(auth.currentUser);
+    };
+
+    void bootstrapSession();
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      void handleExistingUser(user);
     });
-    return () => unsubscribe();
+
+    return () => {
+      isCancelled = true;
+      unsubscribe();
+    };
   }, [authActionInProgress, router]);
+
+  if (checkingSession && !authActionInProgress) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-24 flex items-center justify-center">
+        <div className="mx-auto w-full max-w-md rounded-2xl border border-amber-200/20 bg-white/[0.03] p-7 md:p-8 shadow-2xl backdrop-blur-sm text-center text-slate-300">
+          Checking your session...
+        </div>
+      </main>
+    );
+  }
 
   const validateInputs = () => {
     const normalizedEmail = normalizeEmail(email);
@@ -84,11 +124,11 @@ export default function LoginPage() {
 
       if (access?.status === 'active') {
         setFeedback({ type: 'success', message: 'Logged in successfully.' });
-        router.push('/en/dashboard');
+        router.replace('/en/dashboard');
         return;
       }
 
-      router.push('/portal');
+      router.replace('/portal');
     } catch (error: unknown) {
       const code = (error as { code?: string })?.code;
       let message = 'Unexpected error occurred.';
@@ -119,11 +159,11 @@ export default function LoginPage() {
       const access = signedInEmail ? await ensureDashboardAccessRequest(signedInEmail) : null;
 
       if (access?.status === 'active') {
-        router.push('/en/dashboard');
+        router.replace('/en/dashboard');
         return;
       }
 
-      router.push('/portal');
+      router.replace('/portal');
     } catch {
       setFeedback({ type: 'error', message: 'Google sign-in failed.' });
     } finally {
