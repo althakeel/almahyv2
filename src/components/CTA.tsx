@@ -83,11 +83,11 @@ export default function CTA({ locale = "en" }: CTAProps) {
 
               {/* PHONE NUMBER */}
               <Link
-                href="https://wa.me/971542185535?text=Hello%2C%20I%20would%20like%20to%20get%20accounting%20services"
+                href="https://wa.me/971504096028?text=Hello%2C%20I%20would%20like%20to%20get%20accounting%20services"
                 target="_blank"
                 className="block text-3xl md:text-4xl font-bold mb-4 hover:opacity-90"
               >
-                +971 5421 85535
+                +971 5040 96028
               </Link>
 
               {/* TEXT */}
@@ -97,7 +97,7 @@ export default function CTA({ locale = "en" }: CTAProps) {
 
               {/* BUTTON */}
               <Link
-                href="https://wa.me/971542185535?text=Hello%2C%20I%20would%20like%20to%20get%20accounting%20services"
+                href="https://wa.me/971504096028?text=Hello%2C%20I%20would%20like%20to%20get%20accounting%20services"
                 target="_blank"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#DE3B34] rounded-lg font-semibold hover:bg-[#FFB6B6] transition"
               >

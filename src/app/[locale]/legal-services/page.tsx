@@ -273,7 +273,7 @@ export default async function LegalServicesPage({
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <a
-                  href="https://wa.me/971542185535?text=Hello%2C%20I%20need%20legal%20services"
+                  href="https://wa.me/971504096028?text=Hello%2C%20I%20need%20legal%20services"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full px-7 py-3 font-semibold text-black transition-transform hover:scale-105"

@@ -59,8 +59,8 @@ function StatCard({ number, label, suffix = '' }: StatProps) {
   }, [isVisible, targetNumber]);
 
   const displayValue = () => {
-    let value = count.toFixed(hasB ? 2 : 0);
-    if (hasB) value += 'B';
+    const numeric = hasB ? count.toFixed(2) : Math.round(count).toLocaleString('en-US');
+    let value = hasB ? `${numeric}B` : numeric;
     if (hasPlus) value += '+';
     if (hasPercent) value += '%';
     return value;
@@ -103,7 +103,7 @@ export default function Stats({ locale }: { locale: Locale }) {
           label: "Years of Experience"
         },
         {
-          number: "500+",
+          number: "5000+",
           label: "Cases Won"
         },
         {
@@ -115,7 +115,7 @@ export default function Stats({ locale }: { locale: Locale }) {
           label: "Professional Team Members"
         },
         {
-          number: "1000+",
+          number: "30,000+",
           label: "Legal Documents Processed"
         },
         {
@@ -133,7 +133,7 @@ export default function Stats({ locale }: { locale: Locale }) {
           label: "سنوات من الخبرة"
         },
         {
-          number: "500+",
+          number: "5000+",
           label: "قضية فازت بها"
         },
         {
@@ -145,7 +145,7 @@ export default function Stats({ locale }: { locale: Locale }) {
           label: "أعضاء الفريق المحترف"
         },
         {
-          number: "1000+",
+          number: "30,000+",
           label: "الوثائق القانونية المعالجة"
         },
         {

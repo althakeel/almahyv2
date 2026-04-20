@@ -1,17 +1,19 @@
 import { NextResponse } from 'next/server';
 import { ImageKit, toFile } from '@imagekit/nodejs';
 
+const publicKey = process.env.IMAGEKIT_PUBLIC_KEY;
 const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+const urlEndpoint = process.env.IMAGEKIT_URL_ENDPOINT;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
-const imagekit = privateKey
-  ? new ImageKit({ privateKey })
+const imagekit = publicKey && privateKey && urlEndpoint
+  ? new ImageKit({ publicKey, privateKey, urlEndpoint })
   : null;
 
 export async function POST(request: Request) {
   if (!imagekit) {
     return NextResponse.json(
-      { success: false, message: 'ImageKit is not configured. Please set IMAGEKIT_PRIVATE_KEY.' },
+      { success: false, message: 'ImageKit is not configured. Please set IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, and IMAGEKIT_URL_ENDPOINT.' },
       { status: 500 }
     );
   }

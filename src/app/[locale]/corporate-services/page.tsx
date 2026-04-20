@@ -402,7 +402,7 @@ export default async function CorporateServicesPage({
           </p>
           <div className="flex flex-wrap gap-3">
             <a
-              href="https://wa.me/971542185535?text=Hello%2C%20I%20need%20corporate%20services"
+              href="https://wa.me/971504096028?text=Hello%2C%20I%20need%20corporate%20services"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-full border border-white/25 px-6 py-3 text-white hover:bg-white/10 transition-colors"

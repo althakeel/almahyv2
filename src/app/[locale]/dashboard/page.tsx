@@ -559,8 +559,8 @@ export default function Dashboard() {
       const detailedMessage = error instanceof Error && error.message
         ? error.message
         : locale === 'ar'
-          ? 'فشل رفع الصورة. تأكد من إعدادات ImageKit.'
-          : 'Image upload failed. Check ImageKit configuration.';
+          ? 'فشل رفع الصورة. سبب غير معروف.'
+          : 'Image upload failed due to an unknown error.';
       setBlogFeedback({
         type: 'error',
         message: detailedMessage,

@@ -6,7 +6,7 @@ import { Locale } from "@/lib/translations";
 
 interface ClientLogosMarqueeProps {
   locale: Locale;
-}
+}  
 
 const clientLogos = [
   "040031_4e4c054a279d43dbbb2e32def9e72924mv2-768x274.png",

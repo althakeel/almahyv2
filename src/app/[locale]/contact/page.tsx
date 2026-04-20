@@ -128,8 +128,8 @@ export default async function ContactPage({
                   +971 4264 8831
                 </a>
                 <br />
-                <a href="tel:+971542185535" className="transition text-lg font-semibold" style={{color: '#FFB6B6'}}>
-                  +971 5421 85535
+                <a href="tel:+971504096028" className="transition text-lg font-semibold" style={{color: '#FFB6B6'}}>
+                  +971 5040 96028
                 </a>
               </p>
             </div>
